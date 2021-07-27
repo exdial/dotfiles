@@ -1,0 +1,376 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+
+# BASH config files invocation order
+#
+#  | Login Shell        | Interactive         | Else      |
+#  |--------------------+---------------------+-----------|
+#  | /etc/profile    && | /etc/bash.bashrc && | $BASH_ENV |
+#  | ~/.bash_profile || | ~/.bashrc           |           |
+#  | ~/.bash_login   || |                     |           |
+#  | ~/.profile         |                     |           |
+
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+# Check Bash version
+if ((BASH_VERSINFO[0] < 4)); then
+  echo "Looks like you're running an older version of Bash."
+  echo "You need at least bash-4.0"
+fi
+
+## SHELL OPTIONS ##
+
+# Source system bashrc
+test -r /etc/bash.bashrc && . /etc/bash.bashrc
+
+# Notify bg task completion immediately
+set -o notify
+
+# Prevent file overwrite on stdout redirection
+# Use `>|` to force redirection to an existing file
+#set -o noclobber
+
+# Checks the window size of the current terminal window after each
+# command, and, if necessary, updates the values
+# of the $LINES and $COLUMNS variables
+shopt -s checkwinsize
+
+# Automatically trim long paths in the prompt (requires Bash 4.x)
+PROMPT_DIRTRIM=2
+
+# Disable mail checking
+unset MAILCHECK
+
+# Default umask
+umask 0022
+
+# The extended pattern matching features offered by
+# bash path name expansion
+shopt -s extglob
+
+# Case-insensitive globbing (used in pathname expansion)
+shopt -s nocaseglob
+
+# Terminal type
+export TERM=xterm-256color
+
+## HISTORY STUFF ##
+
+# The history list is appended to the file named by the value
+# of the HISTFILE variable when the shell exits, rather than
+# overwriting the file
+shopt -s histappend
+
+# Save all lines of a multi-line command in the same entry
+shopt -s cmdhist
+
+# Record each line as it gets issued
+PROMPT_COMMAND='history -a'
+
+# Huge history
+HISTSIZE=500000
+HISTFILESIZE=100000
+
+# Avoid duplicate entries
+HISTCONTROL="erasedups:ignoreboth"
+
+# Don't record some commands
+HISTIGNORE="&:exit:ls:[bf]g:history:clear"
+
+# Use standard ISO 8601 timestamp
+# %F equivalent to %Y-%m-%d
+# %T equivalent to %H:%M:%S (24-hours format)
+HISTTIMEFORMAT='%F %T '
+
+# Enable incremental history search with up/down arrows
+# bind '"\e[A": history-search-backward'
+# bind '"\e[B": history-search-forward'
+# bind '"\e[C": forward-char'
+# bind '"\e[D": backward-char'
+
+## DIRECTORY NAVIGATION ##
+
+# Automatically correct mistyped directory names on cd
+shopt -s cdspell 2> /dev/null
+
+# Prepend cd to directory names automatically
+shopt -s autocd 2> /dev/null
+
+# Correct spelling errors during tab-completion
+shopt -s dirspell 2> /dev/null
+
+## TAB-COMPLETION (Readline bindings) ##
+
+# Perform file completion in a case insensitive fashion
+bind "set completion-ignore-case on"
+
+# Treat hyphens and underscores as equivalent
+bind "set completion-map-case on"
+
+# Display matches for ambiguous patterns at first tab press
+bind "set show-all-if-ambiguous on"
+
+# Immediately add a trailing slash when autocompleting symlinks to
+# directories
+bind "set mark-symlinked-directories on"
+
+## BASICS ##
+
+# Base environments
+: ${LOGNAME=$(id -un)}
+: ${HOME=~}
+: ${UNAME=$(uname)}
+
+# Readline config
+: ${INPUTRC=~/.inputrc}
+
+# Complete hostnames from this file
+: ${HOSTFILE=~/.ssh/known_hosts}
+
+## PATH ##
+
+# Setting default PATH
+: ${PATH="/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/bin"}
+
+# Add ~/bin to PATH
+test -d "$HOME/bin" && PATH="$HOME/bin:$PATH"
+
+# Add homebrew bin directories to PATH
+test -d "$HOME/.homebrew/bin" && PATH="$HOME/.homebrew/bin:$PATH"
+test -d "$HOME/.homebrew/sbin" && PATH="$HOME/.homebrew/sbin:$PATH"
+
+# Remove duplicate entries from a PATH style value while
+# retaining the original order
+# Usage: puniq [path]
+puniq() {
+  echo "$1" |tr : '\n' |nl |sort -u -k 2,2 |sort -n |
+  cut -f 2- |tr '\n' : |sed -e 's/:$//' -e 's/^://'
+}
+
+# Clear PATH
+PATH=$(puniq $PATH)
+MANPATH=$(puniq $MANPATH)
+
+## DIR COLORS ##
+
+# Use ANSI color sequences to distinguish file types
+#
+#  | Attribute  | Fg color    | Bg color  |
+#  |------------+-------------+-----------|
+#  | directory  | e (blue)    | x         |
+#  | symbolic   | f (magenta) | x         |
+#  | socket     | c (green)   | x         |
+#  | pipe       | d (brown)   | x         |
+#  | executable | b (red)     | x         |
+#  | block      | e (blue)    | g (cyan)  |
+#  | character  | e (blue)    | d (brown) |
+#  | executable | a (black)   | b (red)   |
+#  | executable | a (black)   | g (cyan)  |
+#  | directory  | a (black)   | c (green) |
+#  | directory  | a (black)   | d (brown) |
+#
+export CLICOLOR=1
+export LS_COLORS='di=1:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
+export LSCOLORS=ExFxBxDxCxegedabagacad
+
+# enable color support
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+fi
+
+## ENVIRONMENT CONFIGURATION ##
+
+# Detect interactive shell
+case "$-" in
+  *i*) INTERACTIVE=yes ;;
+  *) unset INTERACTIVE ;;
+esac
+
+# Detect login shell
+case "$0" in
+  -*) LOGIN=yes ;;
+  *) unset LOGIN ;;
+esac
+
+# Proper locale
+: ${LANG:="en_US.UTF-8"}
+: ${LANGUAGE:="en"}
+: ${LC_CTYPE:="en_US.UTF-8"}
+: ${LC_ALL:="en_US.UTF-8"}
+export LANG LANGUAGE LC_CTYPE LC_ALL
+
+# Always use passive mode FTP
+: ${FTP_PASSIVE:=1}
+export FTP_PASSIVE
+
+if [ "$UNAME" == Darwin ]; then
+  # https://support.apple.com/en-us/HT208050
+  export BASH_SILENCE_DEPRECATION_WARNING=1
+fi
+
+if [ -d "~/.kube/config" ]; then
+  export KUBE_CONFIG_PATH=~/.kube/config
+fi
+
+## EDITOR AND PAGER ##
+
+# Set the default editor
+export EDITOR="vim"
+
+# Set the default pager
+export PAGER="less -FirSwX"
+export MANPAGER="$PAGER"
+
+## ALIASES ##
+
+if [ "$UNAME" == Linux ]; then
+  alias ls='ls --color=auto'
+fi
+
+alias ll='ls -lah'
+alias l='ls'
+
+# Add alias only if vagrant installed
+if `command -v vagrant >/dev/null`; then
+  alias v='vagrant'
+fi
+
+# MacOS only aliases
+if [ "$UNAME" == Darwin ]; then
+  # add alias if caffeinate installed
+  if `command -v caffeinate >/dev/null`; then
+    alias dontsleep='caffeinate -d -t $1'
+  fi
+  # add alias, that launch minimal docker container w/ Linux
+  if `command -v docker >/dev/null`; then
+    alias linux='docker run -it --rm --name linux -h linux.local \
+                            -v linux:/linux ubuntu:18.04 bash'
+    alias linux-alp='docker run -it --rm --name linux -h linux.local \
+                            -v linux:/linux alpine:latest sh'
+  fi
+  # add alias if Sublime Text installed
+  if [ -x "$HOME/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" ]; then
+    alias subl="$HOME/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl"
+  fi
+  # add flushdns alias
+   alias flushdns="sudo killall -HUP mDNSResponder"
+fi
+
+## COMMAND PROMPT ##
+
+# Define prompt colors
+RED="\[\033[0;31m\]"
+BROWN="\[\033[0;33m\]"
+GREY="\[\033[0;97m\]"
+GREEN="\[\033[0;32m\]"
+
+prompt_color_localhost() {
+  if [ `id -un` == "root" ]; then
+    PS1="${RED}\W\$(parse_git_branch)\$(parse_tf_workspace) λ ${BROWN}"
+  else
+    PS1="${GREEN}\W\$(parse_git_branch)\$(parse_tf_workspace) λ ${GREY}"
+  fi
+}
+
+prompt_color_remotehost() {
+  if [ `id -un` == "root" ]; then
+    PS1="${RED}\u@\h:\w\$(parse_git_branch) # ${BROWN}"
+  else
+    PS1="${GREEN}\u@\h:\w\$(parse_git_branch) $ ${GREY}"
+  fi
+}
+
+parse_git_branch() {
+  [ -d .git ] || return 1
+  git symbolic-ref HEAD 2> /dev/null | sed 's#\(.*\)\/\([^\/]*\)$# \2#'
+}
+
+parse_tf_workspace() {
+  [ -d .terraform ] || return 1
+  terraform workspace show | sed 's/^/\ [/g' | sed 's/$/]/g' 2> /dev/null
+}
+
+# Set the default prompt if interactive
+test -n "$PS1" &&
+if [ `uname` == Darwin ]; then
+  prompt_color_localhost
+else
+  prompt_color_remotehost
+fi
+
+# Display welcome screen
+if [ `hostname` == pi ]; then
+  echo
+  neofetch --disable shell packages --ascii_bold off --ascii_distro raspbian
+  echo
+elif [ `hostname` == retro ]; then
+  echo
+  neofetch --disable shell packages --ascii_bold off --ascii_distro retropie
+  echo
+fi
+
+## SSH AGENT ##
+
+SSH_ENV=$HOME/.ssh/env
+
+# Start SSH agent, scan for private keys and load them
+function start_ssh_agent() {
+  ssh-agent | sed 's/^echo/#echo/' > ${SSH_ENV}
+  chmod 0600 ${SSH_ENV}
+  . ${SSH_ENV} > /dev/null
+  for i in $(find ~/.ssh -iname "*id*" | grep -v .pub); do
+    ssh-add $i
+  done
+}
+
+# Source SSH agent settings if it is already running, otherwise start
+# up the agent proprely.
+if [ `id -un` != "root" ]; then
+  if [ -f "${SSH_ENV}" ]; then
+    . ${SSH_ENV} > /dev/null
+    ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
+      start_ssh_agent;
+    }
+  else
+    start_ssh_agent;
+  fi
+fi
+
+## BASH COMPLETIONS ##
+
+# Load Bash completions if available
+if type brew &>/dev/null; then
+  if [ -r $(brew --prefix)/etc/profile.d/bash_completion.sh ]; then
+    . $(brew --prefix)/etc/profile.d/bash_completion.sh
+  fi
+  if [ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]; then
+    . "$(brew --prefix)/etc/profile.d/bash_completion.sh"
+  else
+    for i in "$(brew --prefix)/etc/bash_completion.d/"*; do
+      [[ -r "$i" ]] && . "$i"
+    done
+  fi
+fi
+
+if [ -d "$HOME/.homebrew/Caskroom/google-cloud-sdk" ]; then
+  . $HOME/.homebrew/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.bash.inc
+  . $HOME/.homebrew/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.bash.inc
+fi
+
+## INCLUDE ENVIRONMENT FILES ##
+
+# Load RVM if available
+if [ -s "$HOME/.rvm/scripts/rvm" ]; then
+  . "$HOME/.rvm/scripts/rvm"
+fi
+
+# Load host specific settings without changing the main config
+if [ -f ~/.bashrc.local ]; then
+  . ~/.bashrc.local
+fi
+

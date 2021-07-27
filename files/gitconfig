@@ -1,0 +1,35 @@
+[push]
+  default = current
+
+[core]
+	excludesfile = ~/.gitignore.global
+  autocrlf     = input
+  editor       = vim
+
+[include]
+  path = .gitconfig.local
+
+[commit]
+  template = ~/.gitmessage
+
+[fetch]
+  prune = true
+
+[color]
+  status      = auto
+  branch      = auto
+  interactive = auto
+  diff        = auto
+  ui          = true
+
+[alias]
+  co             = checkout
+  s              = status
+  b              = branch
+  lg             = log --graph '--pretty=tformat:%Cblue%h%Creset %Cgreen%ar%Creset %Cred%an%Creset%Cblue%d%Creset %s'
+  lga            = log --graph '--pretty=tformat:%Cblue%h%Creset %Cgreen%ar%Creset %Cred%an%Creset%Cblue%d%Creset %s' --all
+	clone-branches = "! git branch -a | sed -n \"/\\/HEAD /d; /\\/master$/d; /remotes/p;\" | xargs -L1 git checkout -t"
+	ignore         = "!gi() { curl -L -s https://www.gitignore.io/api/$@ ;}; gi"
+
+[branch]
+  autosetuprebase = always

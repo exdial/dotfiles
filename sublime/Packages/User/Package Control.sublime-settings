@@ -1,0 +1,25 @@
+{
+	"bootstrapped": true,
+	"in_process_packages":
+	[
+	],
+	"installed_packages":
+	[
+		"A File Icon",
+		"Ansible",
+		"Dockerfile Syntax Highlighting",
+		"EditorConfig",
+		"GitGutter",
+		"Kubernetes Manifest autocomplete",
+		"nginx",
+		"Package Control",
+		"SublimeLinter",
+		"SublimeLinter-annotations",
+		"SublimeLinter-contrib-terraform",
+		"SublimeLinter-json",
+		"Tabnine",
+		"Terrafmt",
+		"Terraform",
+		"TerraformSnippets-AWS",
+	],
+}

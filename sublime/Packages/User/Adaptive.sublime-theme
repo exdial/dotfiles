@@ -1,0 +1,13 @@
+// Documentation at https://www.sublimetext.com/docs/themes.html
+{
+  "variables":
+  {
+    "font_face": "system",
+    "font_size_sm": 10,
+    "font_size_lg": 11,
+  },
+  "rules":
+  [
+    
+  ]
+}
