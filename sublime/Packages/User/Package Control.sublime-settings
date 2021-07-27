@@ -18,6 +18,7 @@
 		"SublimeLinter-contrib-terraform",
 		"SublimeLinter-json",
 		"Tabnine",
+		"termX",
 		"Terrafmt",
 		"Terraform",
 		"TerraformSnippets-AWS",
