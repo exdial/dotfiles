@@ -1,41 +1,53 @@
-# disable shebang validation due to the script being executed inside
-# existing shell session
-# shellcheck disable=SC2148
-# ~/.bashrc: executed by bash(1) for non-login shells.
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# for examples
-
-# BASH config files invocation order
+#!/usr/bin/env bash
 #
-#  | Login Shell        | Interactive         | Else      |
-#  |--------------------+---------------------+-----------|
-#  | /etc/profile    && | /etc/bash.bashrc && | $BASH_ENV |
-#  | ~/.bash_profile || | ~/.bashrc           |           |
-#  | ~/.bash_login   || |                     |           |
-#  | ~/.profile         |                     |           |
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see https://www.gnu.org/software/bash/manual/bash.html#Bash-Startup-Files
+# for more information
+#
+#
+#  |  Login shell            |  Interactive shell     | Else        |
+#  |-------------------------+------------------------+-------------|
+#  |  /etc/profile      and  |  /etc/bash.bashrc and  |  $BASH_ENV  |
+#  |  ( ~/.bash_profile or   |  ~/.bashrc             |             |
+#  |    ~/.bash_login   or   |                        |             |
+#  |    ~/.profile )         |                        |             |
+#
 
 # If not running interactively, don't do anything
 case $- in
-    *i*) ;;
-      *) return;;
+  *i*)
+    ;;
+  *)
+    return
+    ;;
 esac
 
-# Check Bash version
+# Check bash version
 if ((BASH_VERSINFO[0] < 4)); then
-  echo "Looks like you're running an older version of Bash."
+  echo "Looks like you're running an older version of bash"
   echo "You need at least bash-4.0"
 fi
 
-## SHELL OPTIONS ##
+
+# Base environments
+# ----------------------------------------------------------------------
+: "${LOGNAME=$(id -un)}"
+: "${HOME=~}"
+: "${UNAME=$(uname)}"
+
+
+# Shell options
+# ----------------------------------------------------------------------
 
 # Source system bashrc
-# shellcheck disable=SC1091
-test -r /etc/bash.bashrc && . /etc/bash.bashrc
+if [[ -r /etc/bash.bashrc ]]; then
+  . /etc/bash.bashrc
+fi
 
 # Notify bg task completion immediately
 set -o notify
 
-# Prevent file overwrite on stdout redirection
+# Uncomment to prevent file overwrite on stdout redirection
 # Use `>|` to force redirection to an existing file
 #set -o noclobber
 
@@ -63,7 +75,9 @@ shopt -s nocaseglob
 # Terminal type
 export TERM=xterm-256color
 
-## HISTORY STUFF ##
+
+# History options
+# ----------------------------------------------------------------------
 
 # The history list is appended to the file named by the value
 # of the HISTFILE variable when the shell exits, rather than
@@ -81,24 +95,26 @@ PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
 HISTSIZE=500000
 HISTFILESIZE=100000
 
-# Avoid duplicate entries
-HISTCONTROL="erasedups:ignoreboth"
-
 # Don't record some commands
 HISTIGNORE="&:exit:ls:[bf]g:history:clear"
+
+# Avoid duplicate entries
+HISTCONTROL="erasedups:ignoreboth"
 
 # Use standard ISO 8601 timestamp
 # %F equivalent to %Y-%m-%d
 # %T equivalent to %H:%M:%S (24-hours format)
 HISTTIMEFORMAT='%F %T '
 
-# Enable incremental history search with up/down arrows
-# bind '"\e[A": history-search-backward'
-# bind '"\e[B": history-search-forward'
-# bind '"\e[C": forward-char'
-# bind '"\e[D": backward-char'
+# Uncomment to enable incremental history search with up/down arrows
+#bind '"\e[A": history-search-backward'
+#bind '"\e[B": history-search-forward'
+#bind '"\e[C": forward-char'
+#bind '"\e[D": backward-char'
 
-## DIRECTORY NAVIGATION ##
+
+# Directory navigation
+# ----------------------------------------------------------------------
 
 # Automatically correct mistyped directory names on cd
 shopt -s cdspell 2> /dev/null
@@ -109,7 +125,9 @@ shopt -s autocd 2> /dev/null
 # Correct spelling errors during tab-completion
 shopt -s dirspell 2> /dev/null
 
-## TAB-COMPLETION (Readline bindings) ##
+
+# Tab-completion (readline bindings)
+# ----------------------------------------------------------------------
 
 # Perform file completion in a case insensitive fashion
 bind "set completion-ignore-case on"
@@ -124,30 +142,35 @@ bind "set show-all-if-ambiguous on"
 # directories
 bind "set mark-symlinked-directories on"
 
-## BASICS ##
-
-# Base environments
-: "${LOGNAME=$(id -un)}"
-: "${HOME=~}"
-: "${UNAME=$(uname)}"
-
 # Readline config
-: "${INPUTRC=~/.inputrc}"
+if [[ -r ~/.inputrc ]]; then
+  : "${INPUTRC=~/.inputrc}"
+fi
 
 # Complete hostnames from this file
-: "${HOSTFILE=~/.ssh/known_hosts}"
+if [[ -r ~/.ssh/known_hosts ]]; then
+  : "${HOSTFILE=~/.ssh/known_hosts}"
+fi
 
-## PATH ##
+
+# PATH
+# ----------------------------------------------------------------------
 
 # Setting default PATH
 : "${PATH="/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/bin"}"
 
 # Add ~/bin to PATH
-test -d "$HOME/bin" && PATH="$HOME/bin:$PATH"
+if [[ -d ~/bin ]]; then
+  PATH="$HOME/bin:$PATH"
+fi
 
 # Add homebrew bin directories to PATH
-test -d "$HOME/.homebrew/bin" && PATH="$HOME/.homebrew/bin:$PATH"
-test -d "$HOME/.homebrew/sbin" && PATH="$HOME/.homebrew/sbin:$PATH"
+if [[ -d "$HOME/.homebrew/bin" ]]; then
+  PATH="$HOME/.homebrew/bin:$PATH"
+fi
+if [[ -d "$HOME/.homebrew/sbin" ]]; then
+  PATH="$HOME/.homebrew/sbin:$PATH"
+fi
 
 # Remove duplicate entries from a PATH style value while
 # retaining the original order
@@ -161,7 +184,9 @@ puniq() {
 PATH=$(puniq $PATH)
 MANPATH=$(puniq "$MANPATH")
 
-## DIR COLORS ##
+
+# Dir colors
+# ----------------------------------------------------------------------
 
 # Use ANSI color sequences to distinguish file types
 #
@@ -183,18 +208,20 @@ export CLICOLOR=1
 export LS_COLORS='di=1:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
 export LSCOLORS=ExFxBxDxCxegedabagacad
 
-# enable color support
-if [ -x /usr/bin/dircolors ]; then
-  if [ -r ~/.dircolors ]; then
+# Enable color support
+if [[ -x /usr/bin/dircolors ]]; then
+  if [[ -r ~/.dircolors ]]; then
     eval "$(dircolors -b ~/.dircolors)"
   else
     eval "$(dircolors -b)"
   fi
 fi
 
-## ENVIRONMENT CONFIGURATION ##
 
-# Proper locale
+# Environment configuration
+# ----------------------------------------------------------------------
+
+# Locale
 : "${LANG:="en_US.UTF-8"}"
 : "${LANGUAGE:="en"}"
 : "${LC_CTYPE:="en_US.UTF-8"}"
@@ -205,58 +232,77 @@ export LANG LANGUAGE LC_CTYPE LC_ALL
 : "${FTP_PASSIVE:=1}"
 export FTP_PASSIVE
 
-if [ "$UNAME" == Darwin ]; then
-  # https://support.apple.com/en-us/HT208050
+# Suppress bash deprecation warning on macOS
+# https://support.apple.com/en-us/HT208050
+if [[ "$UNAME" == Darwin ]]; then
   export BASH_SILENCE_DEPRECATION_WARNING=1
 fi
 
-if [ -d "$HOME/.kube/config" ]; then
+# Set the KUBECONFIG environment variable
+if [[ -r ~/.kube/config ]]; then
   export KUBE_CONFIG_PATH=~/.kube/config
 fi
 
-## EDITOR AND PAGER ##
+# Load RVM environment
+if [[ -s "$HOME/.rvm/scripts/rvm" ]]; then
+  . "$HOME/.rvm/scripts/rvm"
+fi
+
+
+# Editor and pager
+# ----------------------------------------------------------------------
 
 # Set the default editor
-export EDITOR="vim"
+if command -v vim > /dev/null; then
+  export EDITOR='vim'
+elif command -v vi > /dev/null; then
+  export EDITOR='vi'
+fi
 
 # Set the default pager
-export PAGER="less -FirSwX"
+export PAGER='less -FirSwX'
 export MANPAGER="$PAGER"
 
-## ALIASES ##
 
-if [ "$UNAME" == Linux ]; then
+# Aliases
+# ----------------------------------------------------------------------
+
+# Pretty ls aliases
+if [[ "$UNAME" == Linux ]]; then
   alias ls='ls --color=auto'
 fi
 
 alias ll='ls -lah'
 alias l='ls'
 
-# Add alias only if vagrant installed
-if command -v vagrant >/dev/null; then
+# Alias to start Vagrant
+if command -v vagrant > /dev/null; then
   alias v='vagrant'
 fi
 
-# MacOS only aliases
-if [ "$UNAME" == Darwin ]; then
-  # add alias if caffeinate installed
-  if command -v caffeinate >/dev/null; then
-    alias dontsleep='caffeinate -d -t 99999'
-  fi
-  # add alias, that launch minimal docker container w/ Linux
-  if command -v docker >/dev/null; then
-    alias linux='docker run -it --rm --name linux -h linux.local -v linux:/linux ubuntu:18.04 bash'
-    alias linux-alp='docker run -it --rm --name linux -h linux.local -v linux:/linux alpine:latest sh'
-  fi
-  # add alias if Sublime Text installed
-  if [ -x "$HOME/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" ]; then
-    alias subl='$HOME/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl'
-  fi
-  # add flushdns alias
-   alias flushdns="sudo killall -HUP mDNSResponder"
+# Alias to start minimal docker container with Linux
+if command -v docker > /dev/null; then
+  alias linux='docker run -it --rm --name linux -h linux.local \
+               -v linux:/linux ubuntu:18.04 bash'
+  alias alpine='docker run -it --rm --name alpine -h alpine.local \
+               -v linux:/linux alpine:latest sh'
 fi
 
-## COMMAND PROMPT ##
+# macOS specific aliases
+if [[ "$UNAME" == Darwin ]]; then
+
+  # Caffeinate alias
+  if command -v caffeinate > /dev/null; then
+    alias dontsleep='caffeinate -d -t 99999'
+  fi
+
+  # Alias to flush DNS cache
+  alias flushdns='sudo killall -HUP mDNSResponder'
+fi
+
+
+# Command prompt
+# ----------------------------------------------------------------------
 
 # Define prompt colors
 RED="\[\033[0;31m\]"
@@ -265,7 +311,7 @@ GREY="\[\033[0;97m\]"
 GREEN="\[\033[0;32m\]"
 
 prompt_color_localhost() {
-  if [ "$(id -un)" == "root" ]; then
+  if [[ "$(id -un)" == root ]]; then
     PS1="${RED}\W\$(parse_git_branch)\$(parse_tf_workspace) λ ${BROWN}"
   else
     PS1="${GREEN}\W\$(parse_git_branch)\$(parse_tf_workspace) λ ${GREY}"
@@ -273,7 +319,7 @@ prompt_color_localhost() {
 }
 
 prompt_color_remotehost() {
-  if [ "$(id -un)" == "root" ]; then
+  if [[ "$(id -un)" == root ]]; then
     PS1="${RED}\u@\h:\w\$(parse_git_branch) # ${BROWN}"
   else
     PS1="${GREEN}\u@\h:\w\$(parse_git_branch) $ ${GREY}"
@@ -281,103 +327,103 @@ prompt_color_remotehost() {
 }
 
 parse_git_branch() {
-  [ -d .git ] || return 1
-  git symbolic-ref HEAD 2> /dev/null | sed 's#\(.*\)\/\([^\/]*\)$# \2#'
+  if [[ -d .git ]]; then
+    git symbolic-ref HEAD 2> /dev/null | sed 's#\(.*\)\/\([^\/]*\)$# \2#'
+  else
+    return 1
+  fi
 }
 
 parse_tf_workspace() {
-  [ -d .terraform ] || return 1
-  terraform workspace show | sed 's/^/\ [/g' | sed 's/$/]/g' 2> /dev/null
+  if [[ -d .terraform ]]; then
+    terraform workspace show | sed 's/^/\ [/g' | sed 's/$/]/g' 2> /dev/null
+  else
+    return 1
+  fi
 }
 
-# Set the default prompt if interactive
-test -n "$PS1" &&
-if [ "$(uname)" == Darwin ]; then
-  prompt_color_localhost
-else
-  prompt_color_remotehost
+# Set the default prompt if the shell is interactive
+if [[ -n "$PS1" ]]; then
+  if [[ "$(uname)" == Darwin ]]; then
+    prompt_color_localhost
+  else
+    prompt_color_remotehost
+  fi
 fi
 
-# Display welcome screen
-if [ "$(hostname)" == pi ]; then
+# Display the welcome screen
+if [[ "$(hostname)" == pi ]]; then
   echo
   neofetch --disable shell packages --ascii_bold off --ascii_distro raspbian
   echo
-elif [ "$(hostname)" == retro ]; then
+elif [[ "$(hostname)" == retro ]]; then
   echo
   neofetch --disable shell packages --ascii_bold off --ascii_distro retropie
   echo
 fi
 
-## SSH AGENT ##
 
+# SSH agent
+# ----------------------------------------------------------------------
+
+# Default location of SSH environment file
 SSH_ENV=$HOME/.ssh/env
 
 # Start SSH agent, scan for private keys and load them
-function start_ssh_agent() {
-  ssh-agent | sed 's/^echo/#echo/' > ${SSH_ENV}
-  chmod 0600 ${SSH_ENV}
-  # shellcheck source=$HOME/.ssh/env
-  # shellcheck disable=SC1091
-  . ${SSH_ENV} > /dev/null
-  for i in $(find ~/.ssh -iname "*id*" | grep -v .pub); do
-    ssh-add "$i"
+start_ssh_agent() {
+  ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
+  chmod 0600 "${SSH_ENV}"
+  . "${SSH_ENV}" > /dev/null
+  for key in $(find ~/.ssh -iname "*id*" | grep -v .pub); do
+    ssh-add "$key"
   done
 }
 
 # Source SSH agent settings if it is already running, otherwise start
-# up the agent proprely.
-if [ "$(id -un)" != "root" ]; then
-  if [ -f "${SSH_ENV}" ]; then
-    # shellcheck source=$HOME/.ssh/env
-    # shellcheck disable=SC1091
-    . ${SSH_ENV} > /dev/null
+# up the agent proprely
+if [[ "$(id -un)" != root ]]; then
+  if [[ -f "${SSH_ENV}" ]]; then
+    . "${SSH_ENV}" > /dev/null
     pgrep -f ssh-agent > /dev/null || {
-      start_ssh_agent;
+      start_ssh_agent
     }
   else
-    start_ssh_agent;
+    start_ssh_agent
   fi
 fi
 
-## BASH COMPLETIONS ##
 
-# Load Bash completions if available
-if type brew &>/dev/null; then
-  if [ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]; then
-    # shellcheck disable=SC1091
-    . "$(brew --prefix)/etc/profile.d/bash_completion.sh"
+# Bash completions
+# ----------------------------------------------------------------------
+
+# Use bash completions from homebrew
+if command -v brew > /dev/null; then
+  brew_home="$(brew --prefix)"
+  if [[ -r "$brew_home/etc/profile.d/bash_completion.sh" ]]; then
+    . "$brew_home/etc/profile.d/bash_completion.sh"
   fi
-  if [ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]; then
-    # shellcheck disable=SC1091
-    . "$(brew --prefix)/etc/profile.d/bash_completion.sh"
-  else
-    for i in "$(brew --prefix)/etc/bash_completion.d/"*; do
-      # shellcheck source=$HOME/.homebrew/etc/bash_completion.d/*
-      # shellcheck disable=SC1091
-      [[ -r "$i" ]] && . "$i"
+  if [[ -r "$brew_home/etc/profile.d/bash_completion.sh" ]]; then
+    . "$brew_home/etc/profile.d/bash_completion.sh"
+  fi
+  if [[ -d "$brew_home/etc/bash_completion.d" ]]; then
+    for i in "$brew_home/etc/bash_completion.d"*; do
+      [[ -r "i" ]] && . "$i"
     done
   fi
+  
+  # Use completions from Google SDK
+  if [[ -d "$brew_home/Caskroom/google-cloud-sdk" ]]; then
+    google_sdk_home="$brew_home/Caskroom/google-cloud-sdk/latest"
+    . "$google_sdk_home/google-cloud-sdk/completion.bash.inc"
+    . "$google_sdk_home/google-cloud-sdk/path.bash.inc"
+  fi
 fi
 
-if [ -d "$HOME/.homebrew/Caskroom/google-cloud-sdk" ]; then
-  # shellcheck disable=SC1091
-  . $HOME/.homebrew/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.bash.inc
-  # shellcheck disable=SC1091
-  . $HOME/.homebrew/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.bash.inc
-fi
 
-## INCLUDE ENVIRONMENT FILES ##
-
-# Load RVM if available
-if [ -s "$HOME/.rvm/scripts/rvm" ]; then
-  # shellcheck disable=SC1091
-  . "$HOME/.rvm/scripts/rvm"
-fi
+# Include other environments
+# ----------------------------------------------------------------------
 
 # Load host specific settings without changing the main config
-if [ -f ~/.bashrc.local ]; then
-  # shellcheck source=$HOME/.bashrc.local
-  # shellcheck disable=SC1091
+if [[ -f ~/.bashrc.local ]]; then
   . ~/.bashrc.local
 fi
