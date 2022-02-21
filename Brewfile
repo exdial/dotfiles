@@ -23,6 +23,8 @@ brew 'bash'
 brew 'oracle-jdk'
 brew 'neofetch'
 brew 'vim'
+brew 'pass'
+brew 'fping'
 
 # Casks
 cask 'google-cloud-sdk'
