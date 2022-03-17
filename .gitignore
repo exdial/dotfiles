@@ -1,4 +1,26 @@
-# ---> macOS
+
+# Created by https://www.toptal.com/developers/gitignore/api/osx,linux,vim,SublimeText,homebrew
+# Edit at https://www.toptal.com/developers/gitignore?templates=osx,linux,vim,SublimeText,homebrew
+
+### Homebrew ###
+Brewfile.lock.json
+
+### Linux ###
+*~
+
+# temporary files which can be created if a process still has a handle open of a deleted file
+.fuse_hidden*
+
+# KDE directory preferences
+.directory
+
+# Linux trash folder which might appear on any partition or disk
+.Trash-*
+
+# .nfs files are created when an open file is removed but is still being accessed
+.nfs*
+
+### OSX ###
 # General
 .DS_Store
 .AppleDouble
@@ -26,43 +48,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# ---> Linux
-*~
-
-# temporary files which can be created if a process still has a handle open of a deleted file
-.fuse_hidden*
-
-# KDE directory preferences
-.directory
-
-# Linux trash folder which might appear on any partition or disk
-.Trash-*
-
-# .nfs files are created when an open file is removed but is still being accessed
-.nfs*
-
-# ---> Vim
-# Swap
-[._]*.s[a-v][a-z]
-!*.svg  # comment out if you don't need vector files
-[._]*.sw[a-p]
-[._]s[a-rt-v][a-z]
-[._]ss[a-gi-z]
-[._]sw[a-p]
-
-# Session
-Session.vim
-Sessionx.vim
-
-# Temporary
-.netrwhist
-*~
-# Auto-generated tag files
-tags
-# Persistent undo
-[._]*.un~
-
-# ---> SublimeText
+### SublimeText ###
 # Cache files for Sublime Text
 *.tmlanguage.cache
 *.tmPreferences.cache
@@ -95,7 +81,24 @@ bh_unicode_properties.cache
 # https://packagecontrol.io/packages/sublime-github
 GitHub.sublime-settings
 
+### Vim ###
+# Swap
+[._]*.s[a-v][a-z]
+!*.svg  # comment out if you don't need vector files
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
 
-# ---> Custom
-Brewfile.lock.json
+# Session
+Session.vim
+Sessionx.vim
 
+# Temporary
+.netrwhist
+# Auto-generated tag files
+tags
+# Persistent undo
+[._]*.un~
+
+# End of https://www.toptal.com/developers/gitignore/api/osx,linux,vim,SublimeText,homebrew
