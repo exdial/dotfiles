@@ -172,6 +172,11 @@ if [[ -d "$HOME/.homebrew/sbin" ]]; then
   PATH="$HOME/.homebrew/sbin:$PATH"
 fi
 
+# Add homebrew python bin directories to PATH
+if [[ -d "$HOME/.homebrew/opt/python@3.9/bin" ]]; then
+  PATH="$HOME/.homebrew/opt/python@3.9/bin:$PATH"
+fi
+
 # Remove duplicate entries from a PATH style value while
 # retaining the original order
 # Usage: puniq [path]
