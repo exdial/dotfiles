@@ -22,7 +22,7 @@ bye:
 check-git:
 	@command -v git > /dev/null || exit 1
 
-copy-dotfiles: logo ## Copy dotfiles to home directory
+config-dotfiles: logo ## Copy dotfiles to home directory
 	@for i in $$(find files -type f -exec basename {} \;); do \
 		test -f ~/.$$i && mkdir -p ~/dotfiles_save && mv ~/.$$i ~/dotfiles_save/; \
 		echo "λ => copying dotfiles... $$i"; \
@@ -43,34 +43,34 @@ config-vim: logo ## Configure Vim
 	@mkdir -p ~/.vim/autoload ~/.vim/bundle
 	@curl -LSkso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
 
-install-pip: logo ## Install Python PIP
+config-pip: logo ## Install PIP
 	@echo "λ => installing Python PIP..."
 	@curl -LSs https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 	@python3 get-pip.py --user --no-warn-script-location && rm get-pip.py
 
-install-pkgs-linux:
+install-pkgs-linux: ## Install Linux packages (linux only)
 	@echo "λ => installing Linux packages..."
 	@sudo apt-get update
 	@sudo apt-get install -y curl tar git unzip rsync vim restic resilio-sync neofetch --no-install-recommends
 
-install-pkgs-mac:
+install-pkgs-mac: ## Install Mac packages (mac only)
 	@export PATH=/Users/$$USER/.homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 	@command -v brew > /dev/null || echo brew missing && exit 1
 	@echo "λ => installing Brew packages"
 	@brew bundle
 
-install-extra-pkgs-mac:
+install-extra-pkgs-mac: ## Install Mac extra packages (mac only)
 	@export PATH=/Users/$$USER/.homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 	@command -v brew > /dev/null || echo brew missing && exit 1
 	@echo "λ => installing Brew extra packages"
 	@brew bundle --file Brewfile-extra
 
-install-homebrew-mac:
+install-homebrew-mac: ## Install homebrew (mac only)
 	@echo "λ => installing Homebrew"
 	@test -d ~/.homebrew && echo "~/.homebrew exists" && exit 1 || mkdir ~/.homebrew
 	@curl -LSs https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C ~/.homebrew
 
-install-sublime-config-mac: ## Install Sublime Text config (mac only)
+sublime-install-config-mac: ## Install Sublime Text config (mac only)
 	@echo 'λ => copying Sublime Text settings "Installed Packages"...'
 	@rsync -arulzh -progress "sublime/Installed Packages" \
 		"/Users/$$USER/Library/Application Support/Sublime Text"
@@ -78,7 +78,7 @@ install-sublime-config-mac: ## Install Sublime Text config (mac only)
 	@rsync -arulzh -progress "sublime/Packages" \
 		"/Users/$$USER/Library/Application Support/Sublime Text"
 
-backup-sublime-config-mac: ## Backup Sublime Text config (mac only)
+sublime-backup-config-mac: ## Backup Sublime Text config (mac only)
 	@echo 'λ => pulling Sublime Text settings "Installed Packages"...'
 	@rsync -arulzh -progress "/Users/$$USER/Library/Application Support/Sublime Text/Installed Packages" sublime/
 	@echo 'λ => pulling Sublime Text settings "Packages/User"...'
@@ -86,9 +86,9 @@ backup-sublime-config-mac: ## Backup Sublime Text config (mac only)
 
 install: $(TARGET) ## Install software and configure environment
 
-install-on-linux: logo check-git copy-dotfiles config-ssh config-vim install-pip install-pkgs-linux bye
+install-on-linux: logo check-git config-dotfiles config-ssh config-vim config-pip install-pkgs-linux bye
 
-install-on-mac: logo check-git copy-dotfiles config-ssh config-vim install-pip install-homebrew-mac install-pkgs-mac install-extra-pkgs-mac install-sublime-config-mac bye
+install-on-mac: logo check-git config-dotfiles config-ssh config-vim config-pip install-homebrew-mac install-pkgs-mac install-extra-pkgs-mac sublime-install-config-mac bye
 
 wrong-platform:
 	@echo Wrong platform
