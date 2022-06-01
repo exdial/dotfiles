@@ -20,7 +20,7 @@ bye:
 	@echo The system has been successfully configured!
 
 check-git:
-	@command -v git > /dev/null || exit 1
+	@command -v git > /dev/null || echo "Error: git not found" ; exit 1
 
 config-dotfiles: logo ## Copy dotfiles to home directory
 	@for i in $$(find files -type f -exec basename {} \;); do \

@@ -5,11 +5,11 @@
 # for more information
 #
 #
-#  |  Login shell            |  Interactive shell     | Else        |
+#  |  Login shell            |  Interactive shell     |  Else       |
 #  |-------------------------+------------------------+-------------|
-#  |  /etc/profile      and  |  /etc/bash.bashrc and  |  $BASH_ENV  |
-#  |  ( ~/.bash_profile or   |  ~/.bashrc             |             |
-#  |    ~/.bash_login   or   |                        |             |
+#  |  /etc/profile      &&   |  /etc/bash.bashrc &&   |  $BASH_ENV  |
+#  |  ( ~/.bash_profile ||   |  ~/.bashrc             |             |
+#  |    ~/.bash_login   ||   |                        |             |
 #  |    ~/.profile )         |                        |             |
 #
 
