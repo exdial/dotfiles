@@ -4,14 +4,15 @@
 # see https://www.gnu.org/software/bash/manual/bash.html#Bash-Startup-Files
 # for more information
 #
-#
+#  +-------------------------+------------------------+-------------+
 #  |  Login shell            |  Interactive shell     |  Else       |
-#  |-------------------------+------------------------+-------------|
+#  +=========================+========================+=============+
 #  |  /etc/profile      &&   |  /etc/bash.bashrc &&   |  $BASH_ENV  |
 #  |  ( ~/.bash_profile ||   |  ~/.bashrc             |             |
 #  |    ~/.bash_login   ||   |                        |             |
 #  |    ~/.profile )         |                        |             |
-#
+#  +-------------------------+------------------------+-------------+
+
 
 # If not running interactively, don't do anything
 case $- in
@@ -195,8 +196,9 @@ MANPATH=$(puniq "$MANPATH")
 
 # Use ANSI color sequences to distinguish file types
 #
+#  +------------+-------------+-----------+
 #  | Attribute  | Fg color    | Bg color  |
-#  |------------+-------------+-----------|
+#  +============+=============+===========+
 #  | directory  | e (blue)    | x         |
 #  | symbolic   | f (magenta) | x         |
 #  | socket     | c (green)   | x         |
@@ -208,6 +210,7 @@ MANPATH=$(puniq "$MANPATH")
 #  | executable | a (black)   | g (cyan)  |
 #  | directory  | a (black)   | c (green) |
 #  | directory  | a (black)   | d (brown) |
+#  +------------+-------------+-----------+
 #
 export CLICOLOR=1
 export LS_COLORS='di=1:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
@@ -241,6 +244,11 @@ export FTP_PASSIVE
 # https://support.apple.com/en-us/HT208050
 if [[ "$UNAME" == Darwin ]]; then
   export BASH_SILENCE_DEPRECATION_WARNING=1
+fi
+
+# Disable Homebrew reports
+if command -v brew > /dev/null; then
+    export HOMEBREW_NO_ANALYTICS=1
 fi
 
 # Set the KUBECONFIG environment variable
@@ -288,7 +296,7 @@ fi
 # Alias to start minimal docker container with Linux
 if command -v docker > /dev/null; then
   alias linux='docker run -it --rm --name linux -h linux.local \
-               -v linux:/linux ubuntu:18.04 bash'
+               -v linux:/linux ubuntu:20.04 bash'
   alias alpine='docker run -it --rm --name alpine -h alpine.local \
                -v linux:/linux alpine:latest sh'
 fi

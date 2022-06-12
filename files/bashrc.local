@@ -1,4 +1,2 @@
 # Put your local shell settings here
 
-export HOMEBREW_NO_BOTTLE_SOURCE_FALLBACK=1
-
