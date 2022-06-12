@@ -5,7 +5,6 @@ tap 'homebrew/bundle'
 
 # Casks
 cask 'google-cloud-sdk'
-cask 'awscli'
 cask 'oracle-jdk'
 cask 'google-chrome'
 cask 'firefox'
