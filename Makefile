@@ -93,7 +93,16 @@ uninstall: ## Remove dotfiles including ssh config
 			 ~/.inputrc ~/.vimrc ~/.bash_history ~/.bash_sessions ~/.gitconfig.local \
 			 ~/.lesshst ~/.ssh ~/.vim ~/.viminfo ~/.zsh_history ~/.zsh_sessions 2>/dev/null
 
-.PHONY: install uninstall clean
+secrets: ## Make an archive with ssh keys, aws tokens, etc
+	@echo "λ => archiving secrets..."
+	@-mkdir -p secrets && rm secrets.tar.gz
+	@-for i in aws grip hal kube spin ssh; do \
+		cp -Rn ~/.$$i secrets/$$i 2>/dev/null; \
+	done
+	@tar cvfz secrets.tar.gz secrets
+	@-rm -rf secrets
+
+.PHONY: install uninstall clean secrets
 
 help: logo
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
