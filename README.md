@@ -13,6 +13,8 @@ Built-in Makefile provides automated installation of environment settings and re
 
 Only Mac 🍏 and Linux 🐧 are supported platforms.
 
+<p align="center"><img src="assets/screenshot.png"></p>
+
 
 ## Usage
 
