@@ -4,6 +4,7 @@
 
 ### Homebrew ###
 Brewfile.lock.json
+Brewfile-extra.lock.json
 
 ### Linux ###
 *~
