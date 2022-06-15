@@ -1,0 +1,24 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v2.3.0
+  hooks:
+  - id: detect-aws-credentials
+    args: [--allow-missing-credentials]
+  - id: detect-private-key
+  - id: check-added-large-files
+  - id: trailing-whitespace
+  - id: end-of-file-fixer
+  - id: check-case-conflict
+  - id: check-merge-conflict
+
+- repo: https://github.com/jumanjihouse/pre-commit-hooks
+  rev: 2.1.6
+  hooks:
+  - id: markdownlint
+  - id: shfmt
+  - id: shellcheck
+
+# - repo: https://github.com/Lucas-C/pre-commit-hooks-go
+#   rev: v1.0.1
+#   hooks:
+#   - id: checkmake

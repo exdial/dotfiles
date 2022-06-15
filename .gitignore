@@ -1,6 +1,6 @@
 
-# Created by https://www.toptal.com/developers/gitignore/api/osx,linux,vim,SublimeText,homebrew
-# Edit at https://www.toptal.com/developers/gitignore?templates=osx,linux,vim,SublimeText,homebrew
+# Created by https://www.toptal.com/developers/gitignore/api/osx,linux,vim,homebrew
+# Edit at https://www.toptal.com/developers/gitignore?templates=osx,linux,vim,homebrew
 
 ### Homebrew ###
 Brewfile.lock.json
@@ -29,6 +29,7 @@ Brewfile-extra.lock.json
 
 # Icon must end with two \r
 Icon
+
 
 # Thumbnails
 ._*
@@ -69,7 +70,7 @@ tags
 # Persistent undo
 [._]*.un~
 
-# End of https://www.toptal.com/developers/gitignore/api/osx,linux,vim,SublimeText,homebrew
+# End of https://www.toptal.com/developers/gitignore/api/osx,linux,vim,homebrew
 
 secrets/
 secrets.tar.gz

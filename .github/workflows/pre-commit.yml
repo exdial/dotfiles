@@ -1,0 +1,14 @@
+name: pre-commit
+
+on:
+  pull_request:
+    branches: [ master ]
+    workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pre-commit@v3.0.0
