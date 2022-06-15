@@ -13,13 +13,17 @@ else
 	TARGET = wrong-platform
 endif
 
-all: $(TARGET) ## Install all dotfiles, packages and extra
+all: $(TARGET)-extra ## Install dotfiles, packages and extra
 
-install: logo dotfiles sshconfig vim python-pip gitconfig bye ## Install dotfiles
+install: $(TARGET) ## Install only dotfiles
 
-linux: logo dotfiles sshconfig vim python-pip linux-packages gitconfig bye
+linux: logo dotfiles sshconfig vim python-pip gitconfig bye
 
-mac: logo dotfiles sshconfig vim python-pip mac-packages mac-packages-extra gitconfig bye
+linux-extra: logo dotfiles sshconfig vim python-pip linux-packages gitconfig bye
+
+mac: logo dotfiles sshconfig vim python-pip homebrew gitconfig bye
+
+mac-extra: logo dotfiles sshconfig vim python-pip homebrew mac-packages mac-packages-extra gitconfig bye
 
 wrong-platform: logo
 	@echo Wrong platform
@@ -102,7 +106,7 @@ secrets: ## Make an archive with ssh keys, aws tokens, etc
 	@tar cvfz secrets.tar.gz secrets
 	@-rm -rf secrets
 
-.PHONY: install uninstall clean secrets
+.PHONY: all clean install secrets uninstall
 
 help: logo
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
