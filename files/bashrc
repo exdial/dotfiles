@@ -423,7 +423,7 @@ if command -v brew > /dev/null; then
       [[ -r "i" ]] && . "$i"
     done
   fi
-  
+
   # Use completions from Google SDK
   if [[ -d "$brew_home/Caskroom/google-cloud-sdk" ]]; then
     google_sdk_home="$brew_home/Caskroom/google-cloud-sdk/latest"

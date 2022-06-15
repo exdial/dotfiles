@@ -5,4 +5,3 @@
 # You can fix this by sourcing .bashrc from your .bash_profile file,
 # then putting PATH and common settings in .bashrc.
 test -f ~/.bashrc && . ~/.bashrc
-
