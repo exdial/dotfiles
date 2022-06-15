@@ -7,6 +7,8 @@
         \__,_|\___/ \__|_| |_|_|\___||___/
 ```
 
+[![pre-commit](https://github.com/repconn/dotfiles/actions/workflows/pre-commit.yml/badge.svg?branch=master)](https://github.com/repconn/dotfiles/actions/workflows/pre-commit.yml)
+
 # Abstract
 
 This repository serves as a central storage for all environment settings (dotfiles).
