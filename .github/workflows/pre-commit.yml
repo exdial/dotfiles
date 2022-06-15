@@ -1,9 +1,10 @@
-name: pre-commit
+name: "pre-commit"
 
 on:
   pull_request:
     branches: [ master ]
-    workflow_dispatch:
+  workflow_dispatch:
+
 
 jobs:
   check:
