@@ -11,7 +11,7 @@
 
 # Abstract
 
-This repository serves as a central storage for all environment settings (dotfiles).
+This repository serves as a storage for all environment settings (dotfiles).
 Built-in Makefile provides automated installation of environment settings
 and recommended software.
 
@@ -19,13 +19,13 @@ Only Mac 🍏 and Linux 🐧 are supported platforms.
 
 ![](assets/screenshot.png)
 
-## Usage
-
-Built-in Makefile will help you to manage **Bash**, **Git** and **Vim** settings,
+Built-in Makefile will help you manage **Bash**, **Git** and **Vim** settings,
 **.dircolors**, **.editorconfig**, **.inputrc** and so on.
 
-This will never change or delete [sensitive directories](#secrets-management),
-which usually contain important tokens or keys.
+This will never change or delete [sensitive files or directories](#secrets),
+which usually contain important tokens and keys.
+
+## Usage
 
 Open Terminal program on this repository and run `make`.
 You will see the options available to you.
@@ -48,24 +48,24 @@ You can find them by name *dotfiles_save_* in your home directory.
 `make clean` command will delete these backup directories from your computer.
 
 You can run `make install` instead of `make all` to install the only dotfiles
-without performing installation heavy packages, like browsers, etc.
+without performing installation heavy packages, like browsers, messengers, etc.
 
-Among other things you can find the option of dotfiles uninstallation quite useful.
-Run `make uninstall` to remove all dotfiles including the SSH configuration file.
+You can find uninstallation the option quite useful as well.
+Run `make uninstall` to remove all dotfiles including SSH configuration file.
 
-## Secrets management
+## Secrets
 
-These sensitive directories will not be overwritten or deleted during
-dotfiles management: `~/.aws`, `~/.grip`, `~/.hal`, `~/.kube`, `~/.spin`, `~/.ssh`.
+These sensitive directories will not be overwritten or deleted as a result of
+automated installation: `~/.aws`, `~/.grip`, `~/.hal`, `~/.kube`, `~/.spin`, `~/.ssh`.
 The option `make secrets` will copy these directories and create
 an archive in the current directory named *secrets.tar.gz*,
 that can be easily transferred to a new location.
 
 ## Terminal.app customization
 
-You can use Btrack.terminal from the root of this repository to adjust your terminal
+You can use Default.terminal from the root of this repository to adjust your terminal
 appearance. Learn more about [how to set up terminal profiles in Terminal.app](https://support.apple.com/en-gb/guide/terminal/trml107/2.12/mac/11.0).
 
 ## Feedback
 
-Suggestions and improvements are [welcome](https://github.com/repconn/dotfiles/issues).
+[Suggestions and improvements](https://github.com/repconn/dotfiles/issues).
