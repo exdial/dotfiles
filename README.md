@@ -24,7 +24,7 @@ Only Mac 🍏 and Linux 🐧 are supported platforms.
 Built-in Makefile will help you to manage **Bash**, **Git** and **Vim** settings,
 **.dircolors**, **.editorconfig**, **.inputrc** and so on.
 
-This will never change or delete [sensetive directories](#secrets-management),
+This will never change or delete [sensitive directories](#secrets-management),
 which usually contain important tokens or keys.
 
 Open Terminal program on this repository and run `make`.
@@ -38,7 +38,7 @@ secrets        Make an archive with ssh keys, aws tokens, etc
 uninstall      Remove dotfiles including ssh config
 ```
 
-Run `make all` to install preconfigured dotfiles and the list of recommended software
+Run `make all` to install pre-configured dotfiles and the list of recommended software
 on your system. Please note it is potentially dangerous operation that can delete
 all your previous settings. In the end of installation, you will be asking for
 email and name to complete configuration of *.gitconfig*.
@@ -55,10 +55,10 @@ Run `make uninstall` to remove all dotfiles including the SSH configuration file
 
 ## Secrets management
 
-These sensetive directories will not be overwritten or deleted during
+These sensitive directories will not be overwritten or deleted during
 dotfiles management: `~/.aws`, `~/.grip`, `~/.hal`, `~/.kube`, `~/.spin`, `~/.ssh`.
 The option `make secrets` will copy these directories and create
-an archive in the current directory nameed *secrets.tar.gz*,
+an archive in the current directory named *secrets.tar.gz*,
 that can be easily transferred to a new location.
 
 ## Terminal.app customization
