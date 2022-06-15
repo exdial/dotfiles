@@ -60,3 +60,12 @@ dotfiles management: `~/.aws`, `~/.grip`, `~/.hal`, `~/.kube`, `~/.spin`, `~/.ss
 The option `make secrets` will copy these directories and create
 an archive in the current directory nameed *secrets.tar.gz*,
 that can be easily transferred to a new location.
+
+## Terminal.app customization
+
+You can use Btrack.terminal from the root of this repository to adjust your terminal
+appearance. Learn more about [how to set up terminal profiles in Terminal.app](https://support.apple.com/en-gb/guide/terminal/trml107/2.12/mac/11.0).
+
+## Feedback
+
+Suggestions and improvements are [welcome](https://github.com/repconn/dotfiles/issues).
