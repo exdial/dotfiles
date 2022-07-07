@@ -16,8 +16,8 @@
 # Shellcheck options
 # shellcheck source=/dev/null
 
-# If not running interactively, do nothing
-case $- in
+# If not running interactively, don't do anything
+case "$-" in
   *i*)
     ;;
   *)
@@ -32,18 +32,11 @@ if ((BASH_VERSINFO[0] < 4)); then
 fi
 
 
-# Base environments
-# ----------------------------------------------------------------------
-: "${LOGNAME=$(id -un)}"
-: "${HOME=~}"
-: "${UNAME=$(uname)}"
-
-
 # Shell options
 # ----------------------------------------------------------------------
 
 # Source system bashrc
-if [[ -r /etc/bash.bashrc ]]; then
+if [ -r /etc/bash.bashrc ]; then
   . /etc/bash.bashrc
 fi
 
@@ -146,12 +139,12 @@ bind "set show-all-if-ambiguous on"
 bind "set mark-symlinked-directories on"
 
 # Readline config
-if [[ -r ~/.inputrc ]]; then
+if [ -r ~/.inputrc ]; then
   : "${INPUTRC=~/.inputrc}"
 fi
 
 # Complete hostnames from this file
-if [[ -r ~/.ssh/known_hosts ]]; then
+if [ -r ~/.ssh/known_hosts ]; then
   : "${HOSTFILE=~/.ssh/known_hosts}"
 fi
 
@@ -163,20 +156,20 @@ fi
 : "${PATH="/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/bin"}"
 
 # Add ~/bin to PATH
-if [[ -d ~/bin ]]; then
+if [ -d ~/bin ]; then
   PATH="$HOME/bin:$PATH"
 fi
 
 # Add homebrew bin directories to PATH
-if [[ -d "$HOME/.homebrew/bin" ]]; then
+if [ -d "$HOME/.homebrew/bin" ]; then
   PATH="$HOME/.homebrew/bin:$PATH"
 fi
-if [[ -d "$HOME/.homebrew/sbin" ]]; then
+if [ -d "$HOME/.homebrew/sbin" ]; then
   PATH="$HOME/.homebrew/sbin:$PATH"
 fi
 
 # Add homebrew python bin directories to PATH
-if [[ -d "$HOME/.homebrew/opt/python@3.9/bin" ]]; then
+if [ -d "$HOME/.homebrew/opt/python@3.9/bin" ]; then
   PATH="$HOME/.homebrew/opt/python@3.9/bin:$PATH"
 fi
 
@@ -219,8 +212,8 @@ export LS_COLORS='di=1:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
 export LSCOLORS=ExFxBxDxCxegedabagacad
 
 # Enable color support
-if [[ -x /usr/bin/dircolors ]]; then
-  if [[ -r ~/.dircolors ]]; then
+if [ -x /usr/bin/dircolors ]; then
+  if [ -r ~/.dircolors ]; then
     eval "$(dircolors -b ~/.dircolors)"
   else
     eval "$(dircolors -b)"
@@ -244,7 +237,7 @@ export FTP_PASSIVE
 
 # Suppress bash deprecation warning on macOS
 # https://support.apple.com/en-us/HT208050
-if [[ "$UNAME" == Darwin ]]; then
+if [ "$(uname)" == Darwin ]; then
   export BASH_SILENCE_DEPRECATION_WARNING=1
 fi
 
@@ -254,12 +247,12 @@ if command -v brew > /dev/null; then
 fi
 
 # Set the KUBECONFIG environment variable
-if [[ -r ~/.kube/config ]]; then
+if [ -r ~/.kube/config ]; then
   export KUBE_CONFIG_PATH=~/.kube/config
 fi
 
 # Load RVM environment
-if [[ -s "$HOME/.rvm/scripts/rvm" ]]; then
+if [ -s "$HOME/.rvm/scripts/rvm" ]; then
   . "$HOME/.rvm/scripts/rvm"
 fi
 
@@ -283,19 +276,19 @@ export MANPAGER="$PAGER"
 # ----------------------------------------------------------------------
 
 # Pretty ls aliases
-if [[ "$UNAME" == Linux ]]; then
+if [ "$(uname)" == Linux ]; then
   alias ls='ls --color=auto'
 fi
 
 alias ll='ls -lah'
 alias l='ls'
 
-# Vagrant
+# Alias to start Vagrant
 if command -v vagrant > /dev/null; then
   alias v='vagrant'
 fi
 
-# Run a minimal docker container with Linux. Quite useful on Macos
+# Alias to start minimal docker container with Linux
 if command -v docker > /dev/null; then
   alias linux='docker run -it --rm --name linux -h linux.local \
                -v linux:/linux ubuntu:20.04 bash'
@@ -304,14 +297,14 @@ if command -v docker > /dev/null; then
 fi
 
 # macOS specific aliases
-if [[ "$UNAME" == Darwin ]]; then
+if [ "$(uname)" == Darwin ]; then
 
-  # Caffeinate
+  # Caffeinate alias
   if command -v caffeinate > /dev/null; then
     alias dontsleep='caffeinate -d -t 99999'
   fi
 
-  # Flush DNS cache
+  # Alias to flush DNS cache
   alias flushdns='sudo killall -HUP mDNSResponder'
 fi
 
@@ -326,7 +319,7 @@ GREY="\[\033[0;97m\]"
 GREEN="\[\033[0;32m\]"
 
 prompt_color_localhost() {
-  if [[ "$(id -un)" == root ]]; then
+  if [ "$(id -un)" == root ]; then
     PS1="${RED}\W\$(parse_git_branch)\$(parse_tf_workspace) λ ${BROWN}"
   else
     PS1="${GREEN}\W\$(parse_git_branch)\$(parse_tf_workspace) λ ${GREY}"
@@ -334,7 +327,7 @@ prompt_color_localhost() {
 }
 
 prompt_color_remotehost() {
-  if [[ "$(id -un)" == root ]]; then
+  if [ "$(id -un)" == root ]; then
     PS1="${RED}\u@\h:\w\$(parse_git_branch) # ${BROWN}"
   else
     PS1="${GREEN}\u@\h:\w\$(parse_git_branch) $ ${GREY}"
@@ -342,7 +335,7 @@ prompt_color_remotehost() {
 }
 
 parse_git_branch() {
-  if [[ -d .git ]]; then
+  if [ -d .git ]; then
     git symbolic-ref HEAD 2> /dev/null | sed 's#\(.*\)\/\([^\/]*\)$# \2#'
   else
     return 1
@@ -350,7 +343,7 @@ parse_git_branch() {
 }
 
 parse_tf_workspace() {
-  if [[ -d .terraform ]]; then
+  if [ -d .terraform ]; then
     terraform workspace show | sed 's/^/\ [/g' | sed 's/$/]/g' 2> /dev/null
   else
     return 1
@@ -358,8 +351,8 @@ parse_tf_workspace() {
 }
 
 # Set the default prompt if the shell is interactive
-if [[ -n "$PS1" ]]; then
-  if [[ "$(uname)" == Darwin ]]; then
+if [ -n "$PS1" ]; then
+  if [ "$(uname)" == Darwin ]; then
     prompt_color_localhost
   else
     prompt_color_remotehost
@@ -367,11 +360,11 @@ if [[ -n "$PS1" ]]; then
 fi
 
 # Display the welcome screen
-if [[ "$(hostname)" == pi ]]; then
+if [ "$(hostname)" == pi ]; then
   echo
   neofetch --disable shell packages --ascii_bold off --ascii_distro raspbian
   echo
-elif [[ "$(hostname)" == retro ]]; then
+elif [ "$(hostname)" == retro ]; then
   echo
   neofetch --disable shell packages --ascii_bold off --ascii_distro retropie
   echo
@@ -396,8 +389,8 @@ start_ssh_agent() {
 
 # Source SSH agent settings if it is already running, otherwise start
 # up the agent proprely
-if [[ "$(id -un)" != root ]]; then
-  if [[ -f "${SSH_ENV}" ]]; then
+if [ "$(id -un)" != root ]; then
+  if [ -f "${SSH_ENV}" ]; then
     . "${SSH_ENV}" > /dev/null
     pgrep -f ssh-agent > /dev/null || {
       start_ssh_agent
@@ -411,23 +404,23 @@ fi
 # Bash completions
 # ----------------------------------------------------------------------
 
-# Load bash completions from homebrew
+# Use bash completions from homebrew
 if command -v brew > /dev/null; then
   brew_home="$(brew --prefix)"
-  if [[ -r "$brew_home/etc/profile.d/bash_completion.sh" ]]; then
+  if [ -r "$brew_home/etc/profile.d/bash_completion.sh" ]; then
     . "$brew_home/etc/profile.d/bash_completion.sh"
   fi
-  if [[ -r "$brew_home/etc/profile.d/bash_completion.sh" ]]; then
+  if [ -r "$brew_home/etc/profile.d/bash_completion.sh" ]; then
     . "$brew_home/etc/profile.d/bash_completion.sh"
   fi
-  if [[ -d "$brew_home/etc/bash_completion.d" ]]; then
+  if [ -d "$brew_home/etc/bash_completion.d" ]; then
     for i in "$brew_home/etc/bash_completion.d"*; do
-      [[ -r "i" ]] && . "$i"
+      [ -r "i" ] && . "$i"
     done
   fi
 
-  # Load Google SDK completions
-  if [[ -d "$brew_home/Caskroom/google-cloud-sdk" ]]; then
+  # Use completions from Google SDK
+  if [ -d "$brew_home/Caskroom/google-cloud-sdk" ]; then
     google_sdk_home="$brew_home/Caskroom/google-cloud-sdk/latest"
     . "$google_sdk_home/google-cloud-sdk/completion.bash.inc"
     . "$google_sdk_home/google-cloud-sdk/path.bash.inc"
@@ -439,6 +432,6 @@ fi
 # ----------------------------------------------------------------------
 
 # Load host specific settings without changing the main config
-if [[ -f ~/.bashrc.local ]]; then
+if [ -f ~/.bashrc.local ]; then
   . ~/.bashrc.local
 fi

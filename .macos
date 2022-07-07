@@ -1,0 +1,232 @@
+#!/usr/bin/env bash
+
+# Close any open System Preferences panes, to prevent them from overriding
+# settings we’re about to change
+osascript -e 'tell application "System Preferences" to quit'
+
+# Ask for the administrator password upfront
+sudo -v
+
+# Keep-alive: update existing `sudo` time stamp until `.macos` has finished
+while true; do
+  sudo -n true
+  sleep 60
+  kill -0 "$$" || exit
+done 2>/dev/null &
+
+# General UI
+# ----------------------------------------------------------------------
+
+# Disable the sound effects on boot
+sudo nvram SystemAudioVolume=" "
+
+# Keyboard
+# ----------------------------------------------------------------------
+
+# Set a blazingly fast keyboard repeat rate
+defaults write NSGlobalDomain KeyRepeat -int 1
+defaults write NSGlobalDomain InitialKeyRepeat -int 10
+
+# Power saving
+# ----------------------------------------------------------------------
+
+# Disable machine sleep while charging
+sudo pmset -c sleep 0
+
+# Set machine sleep to 5 minutes on battery
+sudo pmset -b sleep 5
+
+# Screen
+# ----------------------------------------------------------------------
+
+# Save screenshots to the desktop
+defaults write com.apple.screencapture location -string "${HOME}/Desktop"
+
+# Save screenshots in PNG format (other options: BMP, GIF, JPG, PDF, TIFF)
+defaults write com.apple.screencapture type -string "png"
+
+# Finder
+# ----------------------------------------------------------------------
+
+# Show hidden files by default
+defaults write com.apple.finder AppleShowAllFiles -bool false
+
+# Show all filename extensions
+defaults write NSGlobalDomain AppleShowAllExtensions -bool false
+
+# Show status bar
+defaults write com.apple.finder ShowStatusBar -bool true
+
+# Keep folders on top when sorting by name
+defaults write com.apple.finder _FXSortFoldersFirst -bool true
+
+# When performing a search, search the current folder by default
+defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+
+# Disable the warning when changing a file extension
+defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+
+# Automatically open a new Finder window when a volume is mounted
+defaults write com.apple.frameworks.diskimages auto-open-ro-root -bool true
+defaults write com.apple.frameworks.diskimages auto-open-rw-root -bool true
+defaults write com.apple.finder OpenWindowForNewRemovableDisk -bool true
+
+# Use list view in all Finder windows by default
+# Four-letter codes for the other view modes: `icnv`, `clmv`, `glyv`
+defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+
+# Dock
+# ----------------------------------------------------------------------
+
+# Set the icon size of Dock items to 36 pixels
+defaults write com.apple.dock tilesize -int 62
+
+# Minimize windows into their application’s icon
+defaults write com.apple.dock minimize-to-application -bool true
+
+# Speed up Mission Control animations
+defaults write com.apple.dock expose-animation-duration -float 0.1
+
+# Remove the auto-hiding Dock delay
+defaults write com.apple.dock autohide-delay -float 0.4
+
+# Remove the animation when hiding/showing the Dock
+defaults write com.apple.dock autohide-time-modifier -float 0.4
+
+# Automatically hide and show the Dock
+defaults write com.apple.dock autohide -bool true
+
+# Don’t show recent applications in Dock
+defaults write com.apple.dock show-recents -bool true
+
+# Set the Dock position to the left
+defaults write com.apple.dock orientation -string "left"
+
+# Safari
+# ----------------------------------------------------------------------
+
+# Don’t send search queries to Apple
+defaults write com.apple.Safari UniversalSearchEnabled -bool false
+defaults write com.apple.Safari SuppressSearchSuggestions -bool true
+
+# Show the full URL in the address bar (note: this still hides the scheme)
+defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
+
+# Set Safari’s home page to `about:blank` for faster loading
+defaults write com.apple.Safari HomePage -string "about:blank"
+
+# Enable Safari’s debug menu
+defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
+
+# Enable the Develop menu and the Web Inspector in Safari
+defaults write com.apple.Safari IncludeDevelopMenu -bool true
+defaults write com.apple.Safari WebKitDeveloperExtrasEnabledPreferenceKey -bool true
+defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled -bool true
+
+# Warn about fraudulent websites
+defaults write com.apple.Safari WarnAboutFraudulentWebsites -bool true
+
+# Terminal
+# ----------------------------------------------------------------------
+
+# Only use UTF-8 in Terminal.app
+defaults write com.apple.terminal StringEncodings -array 4
+
+# Use a specific theme by default in Terminal.app
+osascript <<EOD
+
+tell application "Terminal"
+
+    local allOpenedWindows
+    local initialOpenedWindows
+    local windowID
+    set themeName to "Default"
+
+    (* Store the IDs of all the open terminal windows. *)
+    set initialOpenedWindows to id of every window
+
+    (* Open the custom theme so that it gets added to the list
+       of available terminal themes (note: this will open two
+       additional terminal windows). *)
+    do shell script "open './" & themeName & ".terminal'"
+
+    (* Wait a little bit to ensure that the custom theme is added. *)
+    delay 1
+
+    (* Set the custom theme as the default terminal theme. *)
+    set default settings to settings set themeName
+
+    (* Get the IDs of all the currently opened terminal windows. *)
+    set allOpenedWindows to id of every window
+
+    repeat with windowID in allOpenedWindows
+
+        (* Close the additional windows that were opened in order
+           to add the custom theme to the list of terminal themes. *)
+        if initialOpenedWindows does not contain windowID then
+           close (every window whose id is windowID)
+
+        (* Change the theme for the initial opened terminal windows
+           to remove the need to close them in order for the custom
+           theme to be applied. *)
+        else
+           set current settings of tabs of (every window whose id is windowID) to settings set themeName
+        end if
+
+    end repeat
+
+end tell
+
+EOD
+
+# Enable Secure Keyboard Entry in Terminal.app
+# See: https://security.stackexchange.com/a/47786/8918
+defaults write com.apple.terminal SecureKeyboardEntry -bool true
+
+# Time Machine
+# ----------------------------------------------------------------------
+
+# Prevent Time Machine from prompting to use new hard drives as backup volume
+defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
+
+# Disable local Time Machine backups
+hash tmutil &>/dev/null && sudo tmutil disablelocal
+
+# Photos
+# ----------------------------------------------------------------------
+
+# Prevent Photos from opening automatically when devices are plugged in
+defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
+
+# Transmission.app
+# ----------------------------------------------------------------------
+
+# Don’t prompt for confirmation before downloading
+defaults write org.m0k.transmission DownloadAsk -bool false
+defaults write org.m0k.transmission MagnetOpenAsk -bool false
+
+# Trash original torrent files
+defaults write org.m0k.transmission DeleteOriginalTorrent -bool true
+
+# Hide the donate message
+defaults write org.m0k.transmission WarningDonate -bool false
+
+# Hide the legal disclaimer
+defaults write org.m0k.transmission WarningLegal -bool false
+
+# IP block list
+# https://giuliomac.wordpress.com/2014/02/19/best-blocklist-for-transmission/
+defaults write org.m0k.transmission BlocklistNew -bool true
+defaults write org.m0k.transmission BlocklistURL -string "http://john.bitsurge.net/public/biglist.p2p.gz"
+defaults write org.m0k.transmission BlocklistAutoUpdate -bool true
+
+# Randomize port on launch
+defaults write org.m0k.transmission RandomPort -bool true
+
+# Kill affected applications
+# ----------------------------------------------------------------------
+
+apps="cfprefsd Finder Dock Photos Safari SystemUIServer Terminal Transmission"
+for i in $apps; do
+  killall "${i}" &>/dev/null
+done
