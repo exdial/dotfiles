@@ -110,7 +110,6 @@ tunemymac: ## Apply recommended MacOS settings
 	@echo "λ => applying MacOS settings..."
 	@chmod +x .macos
 	@exec ./.macos
-	@chmod -x ./macos
 
 .PHONY: all clean install secrets uninstall
 

@@ -35,6 +35,7 @@ all            Install all dotfiles, packages and extra
 clean          Remove backup configs
 install        Install dotfiles
 secrets        Make an archive with ssh keys, aws tokens, etc
+tunemymac      Apply recommended MacOS settings
 uninstall      Remove dotfiles including ssh config
 ```
 
@@ -60,11 +61,6 @@ automated installation: `~/.aws`, `~/.grip`, `~/.hal`, `~/.kube`, `~/.spin`, `~/
 The option `make secrets` will copy these directories and create
 an archive in the current directory named *secrets.tar.gz*,
 that can be easily transferred to a new location.
-
-## Terminal.app customization
-
-You can use Default.terminal from the root of this repository to adjust your terminal
-appearance. Learn more about [how to set up terminal profiles in Terminal.app](https://support.apple.com/en-gb/guide/terminal/trml107/2.12/mac/11.0).
 
 ## Feedback
 

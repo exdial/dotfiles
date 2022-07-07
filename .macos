@@ -79,25 +79,16 @@ defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
 # ----------------------------------------------------------------------
 
 # Set the icon size of Dock items to 36 pixels
-defaults write com.apple.dock tilesize -int 62
+defaults write com.apple.dock tilesize -int 46
 
 # Minimize windows into their application’s icon
 defaults write com.apple.dock minimize-to-application -bool true
-
-# Speed up Mission Control animations
-defaults write com.apple.dock expose-animation-duration -float 0.1
-
-# Remove the auto-hiding Dock delay
-defaults write com.apple.dock autohide-delay -float 0.4
-
-# Remove the animation when hiding/showing the Dock
-defaults write com.apple.dock autohide-time-modifier -float 0.4
 
 # Automatically hide and show the Dock
 defaults write com.apple.dock autohide -bool true
 
 # Don’t show recent applications in Dock
-defaults write com.apple.dock show-recents -bool true
+defaults write com.apple.dock show-recents -bool false
 
 # Set the Dock position to the left
 defaults write com.apple.dock orientation -string "left"
@@ -190,7 +181,7 @@ defaults write com.apple.terminal SecureKeyboardEntry -bool true
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 
 # Disable local Time Machine backups
-hash tmutil &>/dev/null && sudo tmutil disablelocal
+hash tmutil &>/dev/null && sudo tmutil disable
 
 # Photos
 # ----------------------------------------------------------------------
