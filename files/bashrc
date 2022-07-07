@@ -18,11 +18,11 @@
 
 # If not running interactively, don't do anything
 case "$-" in
-  *i*)
-    ;;
-  *)
-    return
-    ;;
+*i*) ;;
+
+*)
+  return
+  ;;
 esac
 
 # Check bash version
@@ -30,7 +30,6 @@ if ((BASH_VERSINFO[0] < 4)); then
   echo "Looks like you're running an older version of bash"
   echo "You need at least bash-4.0"
 fi
-
 
 # Shell options
 # ----------------------------------------------------------------------
@@ -71,7 +70,6 @@ shopt -s nocaseglob
 # Terminal type
 export TERM=xterm-256color
 
-
 # History options
 # ----------------------------------------------------------------------
 
@@ -108,19 +106,17 @@ HISTTIMEFORMAT='%F %T '
 #bind '"\e[C": forward-char'
 #bind '"\e[D": backward-char'
 
-
 # Directory navigation
 # ----------------------------------------------------------------------
 
 # Automatically correct mistyped directory names on cd
-shopt -s cdspell 2> /dev/null
+shopt -s cdspell 2>/dev/null
 
 # Prepend cd to directory names automatically
-shopt -s autocd 2> /dev/null
+shopt -s autocd 2>/dev/null
 
 # Correct spelling errors during tab-completion
-shopt -s dirspell 2> /dev/null
-
+shopt -s dirspell 2>/dev/null
 
 # Tab-completion (readline bindings)
 # ----------------------------------------------------------------------
@@ -147,7 +143,6 @@ fi
 if [ -r ~/.ssh/known_hosts ]; then
   : "${HOSTFILE=~/.ssh/known_hosts}"
 fi
-
 
 # PATH
 # ----------------------------------------------------------------------
@@ -177,14 +172,13 @@ fi
 # retaining the original order
 # Usage: puniq [path]
 puniq() {
-  echo "$1" |tr : '\n' |nl |sort -u -k 2,2 |sort -n |
-  cut -f 2- |tr '\n' : |sed -e 's/:$//' -e 's/^://'
+  echo "$1" | tr : '\n' | nl | sort -u -k 2,2 | sort -n |
+    cut -f 2- | tr '\n' : | sed -e 's/:$//' -e 's/^://'
 }
 
 # Clear PATH
 PATH=$(puniq $PATH)
 MANPATH=$(puniq "$MANPATH")
-
 
 # Dir colors
 # ----------------------------------------------------------------------
@@ -220,7 +214,6 @@ if [ -x /usr/bin/dircolors ]; then
   fi
 fi
 
-
 # Environment configuration
 # ----------------------------------------------------------------------
 
@@ -242,8 +235,8 @@ if [ "$(uname)" == Darwin ]; then
 fi
 
 # Disable Homebrew reports
-if command -v brew > /dev/null; then
-    export HOMEBREW_NO_ANALYTICS=1
+if command -v brew >/dev/null; then
+  export HOMEBREW_NO_ANALYTICS=1
 fi
 
 # Set the KUBECONFIG environment variable
@@ -256,21 +249,19 @@ if [ -s "$HOME/.rvm/scripts/rvm" ]; then
   . "$HOME/.rvm/scripts/rvm"
 fi
 
-
 # Editor and pager
 # ----------------------------------------------------------------------
 
 # Set the default editor
-if command -v vim > /dev/null; then
+if command -v vim >/dev/null; then
   export EDITOR='vim'
-elif command -v vi > /dev/null; then
+elif command -v vi >/dev/null; then
   export EDITOR='vi'
 fi
 
 # Set the default pager
 export PAGER='less -FirSwX'
 export MANPAGER="$PAGER"
-
 
 # Aliases
 # ----------------------------------------------------------------------
@@ -284,12 +275,12 @@ alias ll='ls -lah'
 alias l='ls'
 
 # Alias to start Vagrant
-if command -v vagrant > /dev/null; then
+if command -v vagrant >/dev/null; then
   alias v='vagrant'
 fi
 
 # Alias to start minimal docker container with Linux
-if command -v docker > /dev/null; then
+if command -v docker >/dev/null; then
   alias linux='docker run -it --rm --name linux -h linux.local \
                -v linux:/linux ubuntu:20.04 bash'
   alias alpine='docker run -it --rm --name alpine -h alpine.local \
@@ -300,14 +291,13 @@ fi
 if [ "$(uname)" == Darwin ]; then
 
   # Caffeinate alias
-  if command -v caffeinate > /dev/null; then
+  if command -v caffeinate >/dev/null; then
     alias dontsleep='caffeinate -d -t 99999'
   fi
 
   # Alias to flush DNS cache
   alias flushdns='sudo killall -HUP mDNSResponder'
 fi
-
 
 # Command prompt
 # ----------------------------------------------------------------------
@@ -336,7 +326,7 @@ prompt_color_remotehost() {
 
 parse_git_branch() {
   if [ -d .git ]; then
-    git symbolic-ref HEAD 2> /dev/null | sed 's#\(.*\)\/\([^\/]*\)$# \2#'
+    git symbolic-ref HEAD 2>/dev/null | sed 's#\(.*\)\/\([^\/]*\)$# \2#'
   else
     return 1
   fi
@@ -344,7 +334,7 @@ parse_git_branch() {
 
 parse_tf_workspace() {
   if [ -d .terraform ]; then
-    terraform workspace show | sed 's/^/\ [/g' | sed 's/$/]/g' 2> /dev/null
+    terraform workspace show | sed 's/^/\ [/g' | sed 's/$/]/g' 2>/dev/null
   else
     return 1
   fi
@@ -370,7 +360,6 @@ elif [ "$(hostname)" == retro ]; then
   echo
 fi
 
-
 # SSH agent
 # ----------------------------------------------------------------------
 
@@ -379,9 +368,9 @@ SSH_ENV=$HOME/.ssh/env
 
 # Start SSH agent, scan for private keys and load them
 start_ssh_agent() {
-  ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
+  ssh-agent | sed 's/^echo/#echo/' >"${SSH_ENV}"
   chmod 0600 "${SSH_ENV}"
-  . "${SSH_ENV}" > /dev/null
+  . "${SSH_ENV}" >/dev/null
   for key in $(find ~/.ssh -iname "*id*" | grep -v .pub); do
     ssh-add "$key"
   done
@@ -391,8 +380,8 @@ start_ssh_agent() {
 # up the agent proprely
 if [ "$(id -un)" != root ]; then
   if [ -f "${SSH_ENV}" ]; then
-    . "${SSH_ENV}" > /dev/null
-    pgrep -f ssh-agent > /dev/null || {
+    . "${SSH_ENV}" >/dev/null
+    pgrep -f ssh-agent >/dev/null || {
       start_ssh_agent
     }
   else
@@ -400,12 +389,11 @@ if [ "$(id -un)" != root ]; then
   fi
 fi
 
-
 # Bash completions
 # ----------------------------------------------------------------------
 
 # Use bash completions from homebrew
-if command -v brew > /dev/null; then
+if command -v brew >/dev/null; then
   brew_home="$(brew --prefix)"
   if [ -r "$brew_home/etc/profile.d/bash_completion.sh" ]; then
     . "$brew_home/etc/profile.d/bash_completion.sh"
@@ -426,7 +414,6 @@ if command -v brew > /dev/null; then
     . "$google_sdk_home/google-cloud-sdk/path.bash.inc"
   fi
 fi
-
 
 # Include other environments
 # ----------------------------------------------------------------------
