@@ -106,6 +106,12 @@ secrets: ## Make an archive with ssh keys, aws tokens, etc
 	@tar cvfz secrets.tar.gz secrets
 	@-rm -rf secrets
 
+tunemymac: ## Apply recommended MacOS settings
+	@echo "λ => applying MacOS settings..."
+	@chmod +x .macos
+	@exec ./.macos
+	@chmod -x ./macos
+
 .PHONY: all clean install secrets uninstall
 
 help: logo
