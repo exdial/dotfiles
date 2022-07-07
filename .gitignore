@@ -1,6 +1,6 @@
 
-# Created by https://www.toptal.com/developers/gitignore/api/osx,linux,vim,homebrew
-# Edit at https://www.toptal.com/developers/gitignore?templates=osx,linux,vim,homebrew
+# Created by https://gitignore.io/api/osx,linux,vim,homebrew
+# Edit at https://gitignore.io/?templates=osx,linux,vim,homebrew
 
 ### Homebrew ###
 Brewfile.lock.json
@@ -70,7 +70,8 @@ tags
 # Persistent undo
 [._]*.un~
 
-# End of https://www.toptal.com/developers/gitignore/api/osx,linux,vim,homebrew
+# End of https://gitignore.io/api/osx,linux,vim,homebrew
 
 secrets/
 secrets.tar.gz
+.vscode

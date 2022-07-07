@@ -1,8 +1,9 @@
 name: "pre-commit"
 
 on:
-  pull_request:
-    branches: [ master ]
+  push:
+    branches:
+      - '**'
   workflow_dispatch:
 
 
