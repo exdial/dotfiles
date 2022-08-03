@@ -217,6 +217,13 @@ fi
 # Environment configuration
 # ----------------------------------------------------------------------
 
+# Shell
+if [ -f ~/.homebrew/bin/bash ]; then
+  export SHELL=~/.homebrew/bin/bash
+else
+  export SHELL=/bin/bash
+fi
+
 # Locale
 : "${LANG:="en_US.UTF-8"}"
 : "${LANGUAGE:="en"}"
@@ -347,17 +354,6 @@ if [ -n "$PS1" ]; then
   else
     prompt_color_remotehost
   fi
-fi
-
-# Display the welcome screen
-if [ "$(hostname)" == pi ]; then
-  echo
-  neofetch --disable shell packages --ascii_bold off --ascii_distro raspbian
-  echo
-elif [ "$(hostname)" == retro ]; then
-  echo
-  neofetch --disable shell packages --ascii_bold off --ascii_distro retropie
-  echo
 fi
 
 # SSH agent
