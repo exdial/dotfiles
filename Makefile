@@ -42,10 +42,6 @@ common:
 	mkdir -p ~/.vim/autoload ~/.vim/bundle
 	curl -LSkso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
 
-	echo "λ => installing Python PIP..."
-	curl -LSs https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-	python3 get-pip.py --user --no-warn-script-location && rm get-pip.py
-
 mac-specific:
 	echo "λ => installing Homebrew..."
 	test -d ~/.homebrew && echo "~/.homebrew exists" && exit 1 || mkdir ~/.homebrew
