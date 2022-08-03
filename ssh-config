@@ -1,13 +1,3 @@
-Host pi
-User pi
-
-Host retro
-User pi
-
-Host git.lo
-User git
-Port 2222
-
 Host *
 User ubuntu
 UserKnownHostsFile /dev/null
