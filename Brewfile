@@ -22,6 +22,8 @@ brew 'grip'
 brew 'ansible'
 brew 'awscli'
 brew 'pre-commit'
+brew 'tmux'
+
 
 # Casks
 cask 'google-cloud-sdk'
