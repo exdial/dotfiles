@@ -1,6 +1,6 @@
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v2.3.0
+  rev: v4.4.0
   hooks:
   - id: detect-aws-credentials
     args: [--allow-missing-credentials]
@@ -12,7 +12,7 @@ repos:
   - id: check-merge-conflict
 
 - repo: https://github.com/jumanjihouse/pre-commit-hooks
-  rev: 2.1.6
+  rev: 3.0.0
   hooks:
   - id: markdownlint
   - id: shfmt
