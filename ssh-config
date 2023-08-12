@@ -1,12 +1,14 @@
 Host *
-AddKeysToAgent yes
-UseKeychain yes
-User ubuntu
-UserKnownHostsFile /dev/null
-StrictHostKeyChecking false
-IdentityFile ~/.ssh/id_rsa
-LogLevel ERROR
-ControlMaster auto
-ControlPersist 120
-ControlPath ~/.ssh/tmp/%h_%p_%r
-TCPKeepAlive yes
+  User                  ubuntu
+  IdentityFile          ~/.ssh/id_ed25519
+  AddKeysToAgent        yes
+  UseKeychain           yes
+  ForwardX11            no
+  ForwardAgent          no
+  LogLevel              ERROR
+  ControlMaster         auto
+  ControlPersist        120
+  ControlPath           ~/.ssh/tmp/%h_%p_%r
+  TCPKeepAlive          yes
+  UserKnownHostsFile    /dev/null
+  StrictHostKeyChecking false
