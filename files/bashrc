@@ -26,7 +26,7 @@ case "$-" in
 esac
 
 # Check bash version
-if ((BASH_VERSINFO[0] < 4)); then
+if ((BASH_VERSINFO[0] < 4)) && [ "$TERM_PROGRAM" != "vscode" ]; then
   echo "Looks like you're running an older version of bash"
   echo "You need at least bash-4.0"
 fi
@@ -150,17 +150,17 @@ fi
 # Setting default PATH
 : "${PATH="/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/bin"}"
 
-# Add ~/bin to PATH
-if [ -d ~/bin ]; then
-  PATH="$HOME/bin:$PATH"
-fi
-
 # Add homebrew bin directories to PATH
 if [ -d "$HOME/.homebrew/bin" ]; then
   PATH="$HOME/.homebrew/bin:$PATH"
 fi
 if [ -d "$HOME/.homebrew/sbin" ]; then
   PATH="$HOME/.homebrew/sbin:$PATH"
+fi
+
+# Add ~/bin to PATH
+if [ -d ~/bin ]; then
+  PATH="$HOME/bin:$PATH"
 fi
 
 # Add homebrew python bin directories to PATH
@@ -247,7 +247,7 @@ if command -v brew >/dev/null; then
 fi
 
 # Set the KUBECONFIG environment variable
-if [ -r ~/.kube/config ]; then
+if [ -r ~/.kube/config ] || [ command -v kubectl >/dev/null ]; then
   export KUBE_CONFIG_PATH=~/.kube/config
 fi
 
@@ -255,6 +255,10 @@ fi
 if [ -s "$HOME/.rvm/scripts/rvm" ]; then
   . "$HOME/.rvm/scripts/rvm"
 fi
+
+# Disable Hashicorp telemetry
+export VAGRANT_CHECKPOINT_DISABLE=1
+export CHECKPOINT_DISABLE=1
 
 # Editor and pager
 # ----------------------------------------------------------------------
@@ -305,6 +309,8 @@ if [ "$(uname)" == Darwin ]; then
   # Alias to flush DNS cache
   alias flushdns='sudo killall -HUP mDNSResponder'
 fi
+alias k=kubectl
+alias subl="/Users/user/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl"
 
 # Command prompt
 # ----------------------------------------------------------------------
@@ -317,9 +323,9 @@ GREEN="\[\033[0;32m\]"
 
 prompt_color_localhost() {
   if [ "$(id -un)" == root ]; then
-    PS1="${RED}\W\$(parse_git_branch)\$(parse_tf_workspace) λ ${BROWN}"
+    PS1="${RED}\W\$(parse_git_branch)\$(parse_tf_workspace) ➜ ${BROWN}"
   else
-    PS1="${GREEN}\W\$(parse_git_branch)\$(parse_tf_workspace) λ ${GREY}"
+    PS1="${GREEN}\W\$(parse_git_branch)\$(parse_tf_workspace) ➜ ${GREY}"
   fi
 }
 

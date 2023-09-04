@@ -27,27 +27,27 @@ common:
 	echo
 	for i in $$(find files -type f -exec basename {} \;); do \
 		test -f ~/.$$i && mkdir -p ~/dotfiles_save_$(RAND) && mv ~/.$$i ~/dotfiles_save_$(RAND); \
-		echo "λ => copying dotfiles... $$i"; \
+		echo "✔︎ copying dotfiles... $$i"; \
 		cp -Rn files/$$i ~/.$$i; \
 		chown $$USER:$$GROUP ~/.$$i; \
 		chmod 0644 ~/.$$i; \
 	done
 
-	echo "λ => copying SSH config..."
+	echo "✔︎ copying SSH config..."
 	test -f ~/.ssh/config && mv ~/.ssh/config ~/.ssh/config_save_$(RAND) || exit 0
 	mkdir -p ~/.ssh/tmp
 	cp -Rv ssh-config ~/.ssh/config
 
-	echo "λ => configuring Vim..."
+	echo "✔︎ configuring Vim..."
 	mkdir -p ~/.vim/autoload ~/.vim/bundle
 	curl -LSkso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
 
 mac-specific:
-	echo "λ => installing Homebrew..."
+	echo "✔︎ installing Homebrew..."
 	test -d ~/.homebrew && echo "~/.homebrew exists" && exit 1 || mkdir ~/.homebrew
 	curl -LSs https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C ~/.homebrew
 
-	echo "λ => installing Homebrew packages..."
+	echo "✔︎ installing Homebrew packages..."
 	/Users/$$USER/.homebrew/bin/brew bundle
 
 git-config:
@@ -58,19 +58,19 @@ git-config:
 	echo && echo 🍰 The system has been successfully configured! && echo
 
 clean: ## Remove backup configs (~/dotfiles_save_* and ~/.ssh/config_save_*)
-	echo "λ => removing backup configs..."
+	echo "✔︎ removing backup configs..."
 	-rm -rf ~/dotfiles_save_*
 	-rm ~/.ssh/config_save_*
 
 uninstall: ## Remove existing dotfiles from your system (inc. ssh config)
-	echo "λ => removing dotfiles..."
+	echo "✔︎ removing dotfiles..."
 	-rm -rf ~/.bash_profile ~/.bashrc ~/.bashrc.local ~/.dircolors ~/.editorconfig \
 			 ~/.gemrc ~/.gitconfig ~/.gitignore.global ~/.gitmessage ~/.hushlogin \
 			 ~/.inputrc ~/.vimrc ~/.bash_history ~/.bash_sessions ~/.gitconfig.local \
 			 ~/.lesshst ~/.ssh ~/.vim ~/.viminfo ~/.zsh_history ~/.zsh_sessions 2>/dev/null
 
 secrets: ## Make an archive with ssh keys, aws tokens, etc
-	echo "λ => archiving secrets..."
+	echo "✔︎ archiving secrets..."
 	-mkdir -p secrets && rm secrets.tar.gz
 	-for i in aws grip hal kube spin ssh; do \
 		cp -Rn ~/.$$i secrets/$$i 2>/dev/null; \
@@ -79,7 +79,7 @@ secrets: ## Make an archive with ssh keys, aws tokens, etc
 	-rm -rf secrets
 
 tunemymac: ## Apply recommended MacOS settings
-	echo "λ => applying MacOS settings..."
+	echo "✔︎ applying MacOS settings..."
 	chmod +x .macos
 	exec ./.macos
 
