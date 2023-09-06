@@ -206,12 +206,10 @@ export LS_COLORS='di=1:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
 export LSCOLORS=ExFxBxDxCxegedabagacad
 
 # Enable color support
-if [ -x /usr/bin/dircolors ]; then
-  if [ -r ~/.dircolors ]; then
-    eval "$(dircolors -b ~/.dircolors)"
-  else
-    eval "$(dircolors -b)"
-  fi
+if [ -x /usr/bin/dircolors ] && [ -r ~/.dircolors ]; then
+  eval "$(dircolors -b ~/.dircolors)"
+elif [ -x /usr/bin/dircolors ]; then
+  eval "$(dircolors -b)"
 fi
 
 # Environment configuration
@@ -354,12 +352,10 @@ parse_tf_workspace() {
 }
 
 # Set the default prompt if the shell is interactive
-if [ -n "$PS1" ]; then
-  if [ "$(uname)" == Darwin ]; then
-    prompt_color_localhost
-  else
-    prompt_color_remotehost
-  fi
+if [ -n "$PS1" ] && [ "$(uname)" == Darwin ]; then
+  prompt_color_localhost
+elif [ -n "$PS1" ]; then
+  prompt_color_remotehost
 fi
 
 # SSH agent
@@ -380,15 +376,13 @@ start_ssh_agent() {
 
 # Source SSH agent settings if it is already running, otherwise start
 # up the agent proprely
-if [ "$(id -un)" != root ]; then
-  if [ -f "${SSH_ENV}" ]; then
-    . "${SSH_ENV}" >/dev/null
-    pgrep -f ssh-agent >/dev/null || {
-      start_ssh_agent
-    }
-  else
+if [ "$(id -un)" != root ] && [ -f "${SSH_ENV}" ]; then
+  . "${SSH_ENV}" >/dev/null
+  pgrep -f ssh-agent >/dev/null || {
     start_ssh_agent
-  fi
+  }
+elif [ "$(id -un)" != root ]; then
+  start_ssh_agent
 fi
 
 # Bash completions
