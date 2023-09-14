@@ -1,0 +1,23 @@
+{
+	"bootstrapped": true,
+	"in_process_packages":
+	[
+	],
+	"installed_packages":
+	[
+		"A File Icon",
+		"Ansible",
+		"Dockerfile Syntax Highlighting",
+		"EditorConfig",
+		"GitGutter",
+		"GitHub Theme",
+		"Haproxy",
+		"MarkdownLivePreview",
+		"nginx",
+		"Package Control",
+		"SublimeLinter-shellcheck",
+		"Tabnine",
+		"Terrafmt",
+		"Terraform",
+	],
+}

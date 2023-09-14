@@ -83,7 +83,23 @@ tunemymac: ## Apply recommended MacOS settings
 	chmod +x .macos
 	exec ./.macos
 
-.PHONY: clean uninstall secrets tunemymac
+install-sublime-config: ## Install Sublime Text config
+	echo "✔︎ installing Sublime Text config \"Installed Packages\"..."
+	rsync -arulzh -progress "sublime/Installed Packages" \
+		"/Users/$$USER/Library/Application Support/Sublime Text/"
+	echo "✔︎ installing Sublime Text config \"Packages/User\"..."
+	rsync -arulzh -progress "sublime/Packages" \
+		"/Users/$$USER/Library/Application Support/Sublime Text/"
+
+save-sublime-config: ## Backup Sublime Text config
+	echo "✔︎ saving Sublime Text config \"Installed Packages\"..."
+	rsync -arulzh -progress \
+		"/Users/$$USER/Library/Application Support/Sublime Text/Installed Packages" sublime/
+	echo "✔︎ saving Sublime Text config \"Packages/User\"..."
+	rsync -arulzh -progress \
+		"/Users/$$USER/Library/Application Support/Sublime Text/Packages/User" sublime/Packages/
+
+.PHONY: clean uninstall secrets tunemymac install-sublime-config save-sublime-config
 
 help:
 	@clear && head -n7 README.md | tail -n6 && echo
