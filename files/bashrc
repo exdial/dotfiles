@@ -245,7 +245,7 @@ if command -v brew >/dev/null; then
 fi
 
 # Set the KUBECONFIG environment variable
-if [ -r ~/.kube/config ] || [ command -v kubectl >/dev/null ]; then
+if [ -r ~/.kube/config ] || command -v kubectl >/dev/null; then
   export KUBE_CONFIG_PATH=~/.kube/config
 fi
 
