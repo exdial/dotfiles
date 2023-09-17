@@ -121,8 +121,9 @@ save-sublime-config: ## Backup Sublime Text config
 # - USB Compatibility: USB 3.1
 # - Disabled "Share Bluetooth devices with Linux"
 
-VMADDR ?= user@172.16.30.129
-VMPASS ?= user
+# VMADDR format: user@ipaddress
+VMADDR ?= unset
+VMPASS ?= unset
 bootstrap: ## Bootstrap a brand new Linux VM
 	# upload the sudoers config into target system
 	scp vm/etc/sudoers.d/nopasswd $(VMADDR):/tmp
