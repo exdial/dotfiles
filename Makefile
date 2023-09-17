@@ -99,6 +99,64 @@ save-sublime-config: ## Backup Sublime Text config
 	rsync -arulzh -progress \
 		"/Users/$$USER/Library/Application Support/Sublime Text/Packages/User" sublime/Packages/
 
+# VM should have ubuntu-22.04.3-live-server-amd64.iso on the CD drive.
+# Use following settings to create a new VM:
+# Virtualization platform: VMware Fusion
+# Firmware type: Legacy BIOS
+# Machine name: Ubuntu.vmwarevm
+# CPU: 4, RAM 8192 MB
+# Display:
+# - Enabled Accelerated 3D Graphics
+# - Shared graphics memory: 8192 MB
+# - Enabled full resolution for Retina display
+# HDD:
+# - Disk size of 50 GB
+# - Bus type: SCSI
+# - Disabled "Split into multiple files"
+# Removed devices:
+# - Sound card
+# - Printer
+# - Camera
+# USB & Bluetooth
+# - USB Compatibility: USB 3.1
+# - Disabled "Share Bluetooth devices with Linux"
+
+VMADDR ?= user@172.16.30.129
+VMPASS ?= user
+bootstrap: ## Bootstrap a brand new Linux VM
+	# upload the sudoers config into target system
+	scp vm/etc/sudoers.d/nopasswd $(VMADDR):/tmp
+	# using sudo move the sudoers config to the proper location
+	ssh $(VMADDR) " \
+		echo $(VMPASS) | sudo -S cp /tmp/nopasswd /etc/sudoers.d/ \
+	"
+	# install missing packages
+	ssh $(VMADDR) " \
+		sudo apt-get update && \
+		sudo apt-get -y install dialog && \
+		sudo apt-get -y upgrade && \
+		sudo apt-get install locales && \
+		sudo locale-gen --purge en_US.UTF-8 && \
+		echo LANG=en_US.UTF-8 | sudo tee -a /etc/default/locale && \
+		sudo apt-get -y install open-vm-tools open-vm-tools-desktop \
+			xserver-xorg x11-xserver-utils lightdm lightdm-gtk-greeter \
+			vim i3 kitty git make bash-completion --no-install-recommends \
+	"
+	# configure display manager
+	ssh $(VMADDR) "echo GDK_SCALE=2 | sudo tee -a /etc/environment"
+	scp vm/etc/lightdm/lightdm.conf.d/50-display-setup.conf $(VMADDR):/tmp
+	scp vm/usr/share/lightdm_display_setup.sh $(VMADDR):/tmp
+	scp vm/usr/share/lightdm/lightdm-gtk-greeter.conf.d/01_ubuntu.conf $(VMADDR):/tmp
+	scp vm/home/$$USER/.Xresources $(VMADDR):/home/$$USER/.Xresources
+	ssh $(VMADDR) " \
+		sudo mv /tmp/50-display-setup.conf /etc/lightdm/lightdm.conf.d/ && \
+		sudo mv /tmp/lightdm_display_setup.sh /usr/share/ && \
+		sudo chown lightdm:lightdm /usr/share/lightdm_display_setup.sh && \
+		sudo chmod +x /usr/share/lightdm_display_setup.sh && \
+		sudo mv /tmp/01_ubuntu.conf /usr/share/lightdm/lightdm-gtk-greeter.conf.d/ \
+	"
+	echo "Now reboot the VM to apply the new settings"
+
 .PHONY: clean uninstall secrets tunemymac install-sublime-config save-sublime-config
 
 help:
