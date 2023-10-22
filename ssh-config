@@ -2,7 +2,6 @@ Host *
   User                  ubuntu
   IdentityFile          ~/.ssh/id_ed25519
   AddKeysToAgent        yes
-  UseKeychain           yes
   ForwardX11            no
   ForwardAgent          no
   LogLevel              ERROR

@@ -1,3 +1,8 @@
-set completion-ignore-case on
+# Show possible completions on first <tab> press
+# instead of waiting for multiple completions
 set show-all-if-ambiguous on
+
+# Enable case-insensitive tab completion
+set completion-ignore-case on
+
 TAB: menu-complete

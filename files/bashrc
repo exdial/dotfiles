@@ -18,11 +18,11 @@
 
 # If not running interactively, don't do anything
 case "$-" in
-*i*) ;;
-
-*)
-  return
-  ;;
+  *i*)
+    ;;
+  *)
+    return
+    ;;
 esac
 
 # Check bash version
@@ -30,6 +30,18 @@ if ((BASH_VERSINFO[0] < 4)) && [ "$TERM_PROGRAM" != "vscode" ]; then
   echo "Looks like you're running an older version of bash"
   echo "You need at least bash-4.0"
 fi
+
+# Detect OS
+case "$(uname -s)" in
+  Darwin)
+    OS="Darwin"
+    ;;
+  Linux)
+    OS="Linux"
+    ;;
+  *)
+    OS="unset"
+esac
 
 # Shell options
 # ----------------------------------------------------------------------
@@ -177,7 +189,7 @@ puniq() {
 }
 
 # Clear PATH
-PATH=$(puniq $PATH)
+PATH=$(puniq "$PATH")
 MANPATH=$(puniq "$MANPATH")
 
 # Dir colors
@@ -235,7 +247,7 @@ export FTP_PASSIVE
 
 # Suppress bash deprecation warning on macOS
 # https://support.apple.com/en-us/HT208050
-if [ "$(uname)" == Darwin ]; then
+if [ "$OS" == "Darwin" ]; then
   export BASH_SILENCE_DEPRECATION_WARNING=1
 fi
 
@@ -276,28 +288,34 @@ export MANPAGER="$PAGER"
 # ----------------------------------------------------------------------
 
 # Pretty ls aliases
-if [ "$(uname)" == Linux ]; then
+if [ "$OS" == "Linux" ]; then
   alias ls='ls --color=auto'
 fi
 
 alias ll='ls -lah'
 alias l='ls'
 
-# Alias to start Vagrant
+# Vagrant aliases
 if command -v vagrant >/dev/null; then
   alias v='vagrant'
 fi
 
+# Kubectl aliases
+if command -v kubectl >/dev/null; then
+  alias k=kubectl
+fi
+
 # Alias to start minimal docker container with Linux
 if command -v docker >/dev/null; then
-  alias linux='docker run -it --rm --name linux -h linux.local \
-               -v linux:/linux ubuntu:20.04 bash'
-  alias alpine='docker run -it --rm --name alpine -h alpine.local \
-               -v linux:/linux alpine:latest sh'
+  alias linux='docker run -it --rm --name linux -h linux.local -v linux:/linux ubuntu:20.04 bash'
+  alias alpine='docker run -it --rm --name alpine -h alpine.local -v linux:/linux alpine:latest sh'
+elif command -v podman >/dev/null; then
+  alias linux='podman run -it --rm --name linux -h linux.local -v linux:/linux ubuntu:20.04 bash'
+  alias alpine='podman run -it --rm --name alpine -h alpine.local -v linux:/linux alpine:latest sh'
 fi
 
 # macOS specific aliases
-if [ "$(uname)" == Darwin ]; then
+if [ "$OS" == "Darwin" ]; then
 
   # Caffeinate alias
   if command -v caffeinate >/dev/null; then
@@ -306,12 +324,15 @@ if [ "$(uname)" == Darwin ]; then
 
   # Alias to flush DNS cache
   alias flushdns='sudo killall -HUP mDNSResponder'
+
+  # Sublime Text
+  alias subl="/Users/user/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl"
 fi
-alias k=kubectl
-alias subl="/Users/user/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl"
 
 # Command prompt
 # ----------------------------------------------------------------------
+
+PROMPT_SIGN="❯"
 
 # Define prompt colors
 RED="\[\033[0;31m\]"
@@ -320,15 +341,15 @@ GREY="\[\033[0;97m\]"
 GREEN="\[\033[0;32m\]"
 
 prompt_color_localhost() {
-  if [ "$(id -un)" == root ]; then
-    PS1="${RED}\W\$(parse_git_branch)\$(parse_tf_workspace) ➜ ${BROWN}"
+  if [ "$LOGNAME" == root ]; then
+    PS1="${RED}\W\$(parse_git_branch)\$(parse_tf_workspace) ${PROMPT_SIGN} ${BROWN}"
   else
-    PS1="${GREEN}\W\$(parse_git_branch)\$(parse_tf_workspace) ➜ ${GREY}"
+    PS1="${GREEN}\W\$(parse_git_branch)\$(parse_tf_workspace) ${PROMPT_SIGN} ${GREY}"
   fi
 }
 
 prompt_color_remotehost() {
-  if [ "$(id -un)" == root ]; then
+  if [ "$LOGNAME" == root ]; then
     PS1="${RED}\u@\h:\w\$(parse_git_branch) # ${BROWN}"
   else
     PS1="${GREEN}\u@\h:\w\$(parse_git_branch) $ ${GREY}"
@@ -345,14 +366,14 @@ parse_git_branch() {
 
 parse_tf_workspace() {
   if [ -d .terraform ]; then
-    terraform workspace show | sed 's/^/\ [/g' | sed 's/$/]/g' 2>/dev/null
+    terraform workspace show 2>/dev/null | sed 's/^/\ [/g' | sed 's/$/]/g'
   else
     return 1
   fi
 }
 
 # Set the default prompt if the shell is interactive
-if [ -n "$PS1" ] && [ "$(uname)" == Darwin ]; then
+if [ -n "$PS1" ] && [ "$OS" == "Darwin" ]; then
   prompt_color_localhost
 elif [ -n "$PS1" ]; then
   prompt_color_remotehost
@@ -376,39 +397,40 @@ start_ssh_agent() {
 
 # Source SSH agent settings if it is already running, otherwise start
 # up the agent proprely
-if [ "$(id -un)" != root ] && [ -f "${SSH_ENV}" ]; then
+if [ "$LOGNAME" != root ] && [ -f "${SSH_ENV}" ]; then
   . "${SSH_ENV}" >/dev/null
   pgrep -f ssh-agent >/dev/null || {
     start_ssh_agent
   }
-elif [ "$(id -un)" != root ]; then
+elif [ "$LOGNAME" != root ]; then
   start_ssh_agent
 fi
 
 # Bash completions
 # ----------------------------------------------------------------------
 
-# Use bash completions from homebrew
-if command -v brew >/dev/null; then
-  brew_home="$(brew --prefix)"
-  if [ -r "$brew_home/etc/profile.d/bash_completion.sh" ]; then
-    . "$brew_home/etc/profile.d/bash_completion.sh"
-  fi
-  if [ -r "$brew_home/etc/profile.d/bash_completion.sh" ]; then
-    . "$brew_home/etc/profile.d/bash_completion.sh"
-  fi
-  if [ -d "$brew_home/etc/bash_completion.d" ]; then
-    for i in "$brew_home/etc/bash_completion.d"*; do
-      [ -r "i" ] && . "$i"
-    done
-  fi
+command -v brew >/dev/null && brew_home="$(brew --prefix)"
 
-  # Use completions from Google SDK
-  if [ -d "$brew_home/Caskroom/google-cloud-sdk" ]; then
-    google_sdk_home="$brew_home/Caskroom/google-cloud-sdk/latest"
-    . "$google_sdk_home/google-cloud-sdk/completion.bash.inc"
-    . "$google_sdk_home/google-cloud-sdk/path.bash.inc"
-  fi
+# Load homebrew Mac bash completions
+if [ -n "$brew_home" ] && [ -r "$brew_home/etc/profile.d/bash_completion.sh" ]; then
+  . "$brew_home/etc/profile.d/bash_completion.sh"
+fi
+if [ -n "$brew_home" ] && [ -d "$brew_home/etc/bash_completion.d" ]; then
+  for i in "$brew_home"/etc/bash_completion.d/*; do
+    . "$i"
+  done
+fi
+
+# Load Google SDK bash completions
+if [ -n "$brew_home" ] && [ -d "$brew_home/Caskroom/google-cloud-sdk" ]; then
+  . "$brew_home/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.bash.inc"
+  . "$brew_home/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.bash.inc"
+fi
+
+# Load Linux bash completions
+if [ "$OS" == "Linux" ] && [ -d "/etc/bash_completion" ]; then
+  . /etc/bash_completion
+  complete -cf sudo
 fi
 
 # Include other environments
