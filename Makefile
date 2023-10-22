@@ -72,7 +72,7 @@ uninstall: ## Remove existing dotfiles from your system (inc. ssh config)
 secrets: ## Make an archive with ssh keys, aws tokens, etc
 	echo "✔︎ archiving secrets..."
 	-mkdir -p secrets && rm secrets.tar.gz
-	-for i in aws grip hal kube spin ssh; do \
+	-for i in aws grip hal kube spin ssh gnupg; do \
 		cp -Rn ~/.$$i secrets/$$i 2>/dev/null; \
 	done
 	tar cvfz secrets.tar.gz secrets
@@ -141,7 +141,8 @@ bootstrap: ## Bootstrap a brand new Linux VM
 		echo LANG=en_US.UTF-8 | sudo tee -a /etc/default/locale && \
 		sudo apt-get -y install open-vm-tools open-vm-tools-desktop \
 			xserver-xorg x11-xserver-utils lightdm lightdm-gtk-greeter \
-			vim i3 kitty git make bash-completion --no-install-recommends \
+			vim i3 kitty git make bash-completion htop \
+			fonts-firacode fonts-emojione --no-install-recommends \
 	"
 	# configure display manager
 	ssh $(VMADDR) "echo GDK_SCALE=2 | sudo tee -a /etc/environment"
