@@ -54,6 +54,7 @@ brew 'tflint'
 brew 'tmux'
 brew 'vim'
 brew 'watch'
+brew 'yt-dlp'
 
 # Casks
 cask 'amneziavpn'
