@@ -170,9 +170,12 @@ if [ -d "$HOME/.homebrew/sbin" ]; then
   PATH="$HOME/.homebrew/sbin:$PATH"
 fi
 
-# Add ~/bin to PATH
+# Add other bin directories to PATH
 if [ -d ~/bin ]; then
   PATH="$HOME/bin:$PATH"
+fi
+if [ -d "$HOME/.local/bin" ]; then
+  PATH="$HOME/.local/bin:$PATH"
 fi
 
 # Add homebrew python bin directories to PATH
