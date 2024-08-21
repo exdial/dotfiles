@@ -6,7 +6,6 @@ cask_args appdir: '~/Applications'
 tap 'homebrew/bundle'
 
 # Awesome fonts
-tap 'homebrew/cask-fonts'
 cask "font-fira-code"
 
 # Tfswitch
@@ -61,7 +60,6 @@ cask 'amneziavpn'
 cask 'appcleaner'
 cask 'balenaetcher'
 cask 'cyberduck'
-cask 'duckduckgo'
 cask 'google-chrome'
 cask 'google-cloud-sdk'
 cask 'handbrake'
@@ -74,7 +72,6 @@ cask 'raspberry-pi-imager'
 cask 'resilio-sync'
 cask 'skype'
 cask 'slack'
-cask 'sublime-text'
 cask 'telegram'
 cask 'the-unarchiver'
 cask 'tor-browser'
