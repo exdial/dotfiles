@@ -1,0 +1,394 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see https://www.gnu.org/software/bash/manual/bash.html#Bash-Startup-Files
+# for more information
+
+
+# Shellcheck options
+# shellcheck source=/dev/null
+
+# If not running interactively, don't do anything
+case "$-" in
+  *i*) ;;
+  *) return ;;
+esac
+
+# Check bash version
+if ((BASH_VERSINFO[0] < 4)) && [ "$TERM_PROGRAM" != "vscode" ]; then
+  echo "Looks like you're running an older version of bash"
+  echo "You need at least bash-4.0"
+fi
+
+# Detect OS
+case "$(uname -s)" in
+  Darwin) OS="Darwin" ;;
+  Linux) OS="Linux" ;;
+  *) OS="unset"
+esac
+
+# Shell options
+# ----------------------------------------------------------------------
+
+# Source system bashrc
+if [ -r /etc/bash.bashrc ]; then
+  . /etc/bash.bashrc
+fi
+
+# Notify bg task completion immediately
+set -o notify
+
+# Uncomment to prevent file overwrite on stdout redirection
+# Use `>|` to force redirection to an existing file
+#set -o noclobber
+
+# Checks the window size of the current terminal window after each
+# command, and, if necessary, updates the values
+# of the $LINES and $COLUMNS variables
+shopt -s checkwinsize
+
+# Automatically trim long paths in the prompt (requires Bash 4.x)
+PROMPT_DIRTRIM=2
+
+# Disable mail checking
+unset MAILCHECK
+
+# Default umask
+umask 0022
+
+# The extended pattern matching features offered by
+# bash path name expansion
+shopt -s extglob
+
+# Case-insensitive globbing (used in pathname expansion)
+shopt -s nocaseglob
+
+# Terminal type
+export TERM=xterm-256color
+
+# History options
+# ----------------------------------------------------------------------
+
+# The history list is appended to the file named by the value
+# of the HISTFILE variable when the shell exits, rather than
+# overwriting the file
+shopt -s histappend
+
+# Save all lines of a multi-line command in the same entry
+shopt -s cmdhist
+
+# Record each line as it gets issued
+# https://apple.stackexchange.com/a/128999
+PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+
+# Huge history
+HISTSIZE=500000
+HISTFILESIZE=100000
+
+# Don't record some commands
+HISTIGNORE="&:exit:ls:[bf]g:history:clear"
+
+# Avoid duplicate entries
+HISTCONTROL="erasedups:ignoreboth"
+
+# Use standard ISO 8601 timestamp
+# %F equivalent to %Y-%m-%d
+# %T equivalent to %H:%M:%S (24-hours format)
+HISTTIMEFORMAT='%F %T '
+
+# Uncomment to enable incremental history search with up/down arrows
+#bind '"\e[A": history-search-backward'
+#bind '"\e[B": history-search-forward'
+#bind '"\e[C": forward-char'
+#bind '"\e[D": backward-char'
+
+# Directory navigation
+# ----------------------------------------------------------------------
+
+# Automatically correct mistyped directory names on cd
+shopt -s cdspell 2>/dev/null
+
+# Prepend cd to directory names automatically
+shopt -s autocd 2>/dev/null
+
+# Correct spelling errors during tab-completion
+shopt -s dirspell 2>/dev/null
+
+# Tab-completion (readline bindings)
+# ----------------------------------------------------------------------
+
+# Perform file completion in a case insensitive fashion
+bind "set completion-ignore-case on"
+
+# Treat hyphens and underscores as equivalent
+bind "set completion-map-case on"
+
+# Display matches for ambiguous patterns at first tab press
+bind "set show-all-if-ambiguous on"
+
+# Immediately add a trailing slash when autocompleting symlinks to
+# directories
+bind "set mark-symlinked-directories on"
+
+# Readline config
+if [ -r ~/.inputrc ]; then
+  : "${INPUTRC=~/.inputrc}"
+fi
+
+# Complete hostnames from this file
+if [ -r ~/.ssh/known_hosts ]; then
+  : "${HOSTFILE=~/.ssh/known_hosts}"
+fi
+
+# PATH
+# ----------------------------------------------------------------------
+
+# Setting default PATH
+if [ "$OS" == "Darwin" ]; then
+  PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+elif [ "$OS" == "Linux" ]; then
+  PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/usr/local/games:/usr/games"
+else
+  : "${PATH="/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/bin"}"
+fi
+
+# Add homebrew's bin directory to PATH
+if [ -d "$HOME/.homebrew/bin" ]; then
+  PATH="$HOME/.homebrew/bin:$PATH"
+fi
+
+# Add homebrew's sbin directory to PATH
+if [ -d "$HOME/.homebrew/sbin" ]; then
+  PATH="$HOME/.homebrew/sbin:$PATH"
+fi
+
+# Add other bin directories to PATH
+if [ -d ~/bin ]; then
+  PATH="$HOME/bin:$PATH"
+fi
+
+if [ -d "$HOME/.local/bin" ]; then
+  PATH="$HOME/.local/bin:$PATH"
+fi
+
+# Add homebrew's python bin directory to PATH
+if [ -d "$HOME/.homebrew/opt/python@3.9/bin" ]; then
+  PATH="$HOME/.homebrew/opt/python@3.9/bin:$PATH"
+fi
+
+# Colors
+# ----------------------------------------------------------------------
+
+if [ "$OS" == "Linux" ]; then
+  export COLUMNS # for subprocesses
+  source "$HOME/.lscolors"
+  if [ -x /usr/bin/dircolors ] && [ -r ~/.dircolors ]; then
+    eval "$(dircolors -b ~/.dircolors)"
+  elif [ -x /usr/bin/dircolors ]; then
+    eval "$(dircolors -b)"
+  fi
+  function ls {
+    command ls -F -h --color=always -v --author --time-style=long-iso -C "$@"
+  }
+  alias ll='ls -lah'
+  alias l='ls'
+  colorflag="--color"
+elif [ "$OS" == "Darwin" ]; then
+  colorflag="-G"
+  export LSCOLORS='ExFxBxDxCxegedabagacad'
+  alias ls="command ls ${colorflag}"
+fi
+
+# List all files colorized in long format
+alias l="ls -lF ${colorflag}"
+alias ll="ls -lah ${colorflag}"
+# List all files colorized in long format, excluding . and ..
+alias la="ls -lAF ${colorflag}"
+
+# Environment configuration
+# ----------------------------------------------------------------------
+
+# Shell
+if [ -f ~/.homebrew/bin/bash ]; then
+  export SHELL=~/.homebrew/bin/bash
+else
+  export SHELL=/bin/bash
+fi
+
+# Locale
+: "${LANG:="en_US.UTF-8"}"
+: "${LANGUAGE:="en"}"
+: "${LC_CTYPE:="en_US.UTF-8"}"
+: "${LC_ALL:="en_US.UTF-8"}"
+export LANG LANGUAGE LC_CTYPE LC_ALL
+
+# Always use passive mode FTP
+: "${FTP_PASSIVE:=1}"
+export FTP_PASSIVE
+
+# Suppress bash deprecation warning on macOS
+# https://support.apple.com/en-us/HT208050
+if [ "$OS" == "Darwin" ]; then
+  export BASH_SILENCE_DEPRECATION_WARNING=1
+fi
+
+# Disable Homebrew reports
+if command -v brew >/dev/null; then
+  export HOMEBREW_NO_ANALYTICS=1
+fi
+
+# Disable Hashicorp telemetry
+if command -v vagrant >/dev/null; then
+  export VAGRANT_CHECKPOINT_DISABLE=1
+fi
+
+if command -v terraform >/dev/null; then
+  export CHECKPOINT_DISABLE=1
+fi
+
+# Set the KUBECONFIG environment variable
+if [ -r ~/.kube/config ] || command -v kubectl >/dev/null; then
+  export KUBE_CONFIG_PATH=~/.kube/config
+fi
+
+# Load RVM environment
+if [ -s "$HOME/.rvm/scripts/rvm" ]; then
+  . "$HOME/.rvm/scripts/rvm"
+fi
+
+# Editor and pager
+# ----------------------------------------------------------------------
+
+# Set the default editor
+if command -v vim >/dev/null; then
+  export EDITOR='vim'
+elif command -v vi >/dev/null; then
+  export EDITOR='vi'
+fi
+
+# Set the default pager
+export PAGER='less -FirSwX'
+export MANPAGER="$PAGER"
+
+# Aliases
+# ----------------------------------------------------------------------
+
+# Vagrant aliases
+if command -v vagrant >/dev/null; then
+  alias v='vagrant'
+fi
+
+# Kubectl aliases
+if command -v kubectl >/dev/null; then
+  alias k=kubectl
+fi
+
+# Alias to start minimal docker container with Linux
+if command -v docker >/dev/null; then
+  alias linux='docker run -it --rm --name linux -h linux.local -v linux:/linux ubuntu:20.04 bash'
+  alias alpine='docker run -it --rm --name alpine -h alpine.local -v linux:/linux alpine:latest sh'
+elif command -v podman >/dev/null; then
+  alias linux='podman run -it --rm --name linux -h linux.local -v linux:/linux ubuntu:20.04 bash'
+  alias alpine='podman run -it --rm --name alpine -h alpine.local -v linux:/linux alpine:latest sh'
+fi
+
+# macOS specific aliases
+if [ "$OS" == "Darwin" ]; then
+  # Alias to flush DNS cache
+  alias flushdns='sudo killall -HUP mDNSResponder'
+fi
+
+# Command prompt
+# ----------------------------------------------------------------------
+
+PROMPT_SIGN="❯"
+
+# Define prompt colors
+RED="\[\033[0;31m\]"
+BROWN="\[\033[0;33m\]"
+GREY="\[\033[0;97m\]"
+GREEN="\[\033[0;32m\]"
+
+prompt_color_localhost() {
+  if [ "$LOGNAME" == root ]; then
+    PS1="${RED}\W ${PROMPT_SIGN} ${BROWN}"
+  else
+    #PS1="${GREEN}\W ${PROMPT_SIGN} ${GREY}"
+    eval "$(starship init bash)"
+  fi
+}
+
+prompt_color_remotehost() {
+  if [ "$LOGNAME" == root ]; then
+    PS1="${RED}\u@\h:\w # ${BROWN}"
+  else
+    PS1="${GREEN}\u@\h:\w $ ${GREY}"
+  fi
+}
+
+# Set the default prompt if the shell is interactive
+if [ -n "$PS1" ] && [ "$OS" == "Darwin" ]; then
+  prompt_color_localhost
+elif [ -n "$PS1" ]; then
+  prompt_color_remotehost
+fi
+
+# SSH agent
+# ----------------------------------------------------------------------
+
+# Default location of SSH environment file
+SSH_ENV=$HOME/.ssh/env
+
+# Start SSH agent, scan for private keys and load them
+start_ssh_agent() {
+  ssh-agent | sed 's/^echo/#echo/' >"${SSH_ENV}"
+  chmod 0600 "${SSH_ENV}"
+  . "${SSH_ENV}" >/dev/null
+  for key in $(find ~/.ssh -iname "*id*" | grep -v .pub); do
+    ssh-add "$key"
+  done
+}
+
+# Source SSH agent settings if it is already running, otherwise start
+# up the agent proprely
+if [ "$LOGNAME" != root ] && [ -f "${SSH_ENV}" ]; then
+  . "${SSH_ENV}" >/dev/null
+  pgrep -f ssh-agent >/dev/null || {
+    start_ssh_agent
+  }
+elif [ "$LOGNAME" != root ]; then
+  start_ssh_agent
+fi
+
+# Bash completions
+# ----------------------------------------------------------------------
+
+command -v brew >/dev/null && brew_home="$(brew --prefix)"
+
+# Load homebrew Mac bash completions
+if [ -n "$brew_home" ] && [ -r "$brew_home/etc/profile.d/bash_completion.sh" ]; then
+  . "$brew_home/etc/profile.d/bash_completion.sh"
+fi
+if [ -n "$brew_home" ] && [ -d "$brew_home/etc/bash_completion.d" ]; then
+  for i in "$brew_home"/etc/bash_completion.d/*; do
+    . "$i"
+  done
+fi
+
+# Load Google SDK bash completions
+if [ -n "$brew_home" ] && [ -d "$brew_home/Caskroom/google-cloud-sdk" ]; then
+  . "$brew_home/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.bash.inc"
+  . "$brew_home/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.bash.inc"
+fi
+
+# Load Linux bash completions
+if [ "$OS" == "Linux" ] && [ -d "/etc/bash_completion" ]; then
+  . /etc/bash_completion
+  complete -cf sudo
+fi
+
+# Include other environments
+# ----------------------------------------------------------------------
+
+# Load host specific settings without changing the main config
+if [ -f ~/.bashrc.local ]; then
+  . ~/.bashrc.local
+fi
