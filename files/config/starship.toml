@@ -1,0 +1,69 @@
+#
+# ███████╗████████╗ █████╗ ██████╗ ███████╗██╗  ██╗██╗██████╗
+# ██╔════╝╚══██╔══╝██╔══██╗██╔══██╗██╔════╝██║  ██║██║██╔══██╗
+# ███████╗   ██║   ███████║██████╔╝███████╗███████║██║██████╔╝
+# ╚════██║   ██║   ██╔══██║██╔══██╗╚════██║██╔══██║██║██╔═══╝
+# ███████║   ██║   ██║  ██║██║  ██║███████║██║  ██║██║██║
+# ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝╚═╝
+# The minimal, blazing-fast, and infinitely customizable prompt
+# for any shell
+# https://starship.rs
+
+
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Inserts a blank line between shell prompts
+add_newline = false
+
+# Define color palette
+palette = "nord"
+
+format = """
+[](dark_blue)\
+$directory\
+[](bg:blue fg:dark_blue)\
+$git_branch\
+[ ](fg:blue)\
+"""
+
+[directory]
+style = "bg:dark_blue"
+format = "[ $path ]($style)"
+truncation_length = 3
+#truncation_symbol = '…/'
+
+# Here is how you can shorten some long paths by text replacement
+[directory.substitutions]
+'Documents' = '󰈙'
+'Downloads' = ' '
+'Music' = ' '
+'Pictures' = ' '
+'Desktop' = ' '
+'~/SyncBox' = '󱍸 '
+'~/Workspace' = ' '
+'codehub' = '󰚌 '
+'Applications' = ' '
+'Library' = ' '
+'~/bin' = ' '
+'~/.ssh' = '󰣀 '
+'~/.kube' = '󱃾 '
+'.homebrew' = ' '
+
+[git_branch]
+style = "bg:blue"
+symbol = " "
+format = '[ $symbol $branch ]($style)'
+
+[palettes.nord]
+dark_blue = '#5E81AC'
+blue = '#81A1C1'
+teal = '#88C0D0'
+red = '#BF616A'
+orange = '#D08770'
+green = '#A3BE8C'
+yellow = '#EBCB8B'
+purple = '#B48EAD'
+gray = '#434C5E'
+black = '#2E3440'
+white='#D8DEE9'

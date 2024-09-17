@@ -1,28 +1,19 @@
-#!/usr/bin/env bash
+# https://github.com/exdial/dotfiles
 #
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see https://www.gnu.org/software/bash/manual/bash.html#Bash-Startup-Files
 # for more information
-#
-#  +-------------------------+------------------------+-------------+
-#  |  Login shell            |  Interactive shell     |  Else       |
-#  +=========================+========================+=============+
-#  |  /etc/profile      &&   |  /etc/bash.bashrc &&   |  $BASH_ENV  |
-#  |  ( ~/.bash_profile ||   |  ~/.bashrc             |             |
-#  |    ~/.bash_login   ||   |                        |             |
-#  |    ~/.profile )         |                        |             |
-#  +-------------------------+------------------------+-------------+
+
+# Base
+# ----------------------------------------------------------------------
 
 # Shellcheck options
 # shellcheck source=/dev/null
 
 # If not running interactively, don't do anything
 case "$-" in
-  *i*)
-    ;;
-  *)
-    return
-    ;;
+  *i*) ;;
+  *) return ;;
 esac
 
 # Check bash version
@@ -33,14 +24,9 @@ fi
 
 # Detect OS
 case "$(uname -s)" in
-  Darwin)
-    OS="Darwin"
-    ;;
-  Linux)
-    OS="Linux"
-    ;;
-  *)
-    OS="unset"
+  Darwin) OS="Darwin" ;;
+  Linux) OS="Linux" ;;
+  *) OS="unset"
 esac
 
 # Shell options
@@ -160,12 +146,20 @@ fi
 # ----------------------------------------------------------------------
 
 # Setting default PATH
-: "${PATH="/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/bin"}"
+if [ "$OS" == "Darwin" ]; then
+  PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+elif [ "$OS" == "Linux" ]; then
+  PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/usr/local/games:/usr/games"
+else
+  : "${PATH="/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/bin"}"
+fi
 
-# Add homebrew bin directories to PATH
+# Add homebrew's bin directory to PATH
 if [ -d "$HOME/.homebrew/bin" ]; then
   PATH="$HOME/.homebrew/bin:$PATH"
 fi
+
+# Add homebrew's sbin directory to PATH
 if [ -d "$HOME/.homebrew/sbin" ]; then
   PATH="$HOME/.homebrew/sbin:$PATH"
 fi
@@ -174,58 +168,44 @@ fi
 if [ -d ~/bin ]; then
   PATH="$HOME/bin:$PATH"
 fi
+
 if [ -d "$HOME/.local/bin" ]; then
   PATH="$HOME/.local/bin:$PATH"
 fi
 
-# Add homebrew python bin directories to PATH
+# Add homebrew's python bin directory to PATH
 if [ -d "$HOME/.homebrew/opt/python@3.9/bin" ]; then
   PATH="$HOME/.homebrew/opt/python@3.9/bin:$PATH"
 fi
 
-# Remove duplicate entries from a PATH style value while
-# retaining the original order
-# Usage: puniq [path]
-puniq() {
-  echo "$1" | tr : '\n' | nl | sort -u -k 2,2 | sort -n |
-    cut -f 2- | tr '\n' : | sed -e 's/:$//' -e 's/^://'
-}
-
-# Clear PATH
-PATH=$(puniq "$PATH")
-MANPATH=$(puniq "$MANPATH")
-
-# Dir colors
+# Colors
 # ----------------------------------------------------------------------
 
-# Use ANSI color sequences to distinguish file types
-#
-#  +------------+-------------+-----------+
-#  | Attribute  | Fg color    | Bg color  |
-#  +============+=============+===========+
-#  | directory  | e (blue)    | x         |
-#  | symbolic   | f (magenta) | x         |
-#  | socket     | c (green)   | x         |
-#  | pipe       | d (brown)   | x         |
-#  | executable | b (red)     | x         |
-#  | block      | e (blue)    | g (cyan)  |
-#  | character  | e (blue)    | d (brown) |
-#  | executable | a (black)   | b (red)   |
-#  | executable | a (black)   | g (cyan)  |
-#  | directory  | a (black)   | c (green) |
-#  | directory  | a (black)   | d (brown) |
-#  +------------+-------------+-----------+
-#
-export CLICOLOR=1
-export LS_COLORS='di=1:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
-export LSCOLORS=ExFxBxDxCxegedabagacad
-
-# Enable color support
-if [ -x /usr/bin/dircolors ] && [ -r ~/.dircolors ]; then
-  eval "$(dircolors -b ~/.dircolors)"
-elif [ -x /usr/bin/dircolors ]; then
-  eval "$(dircolors -b)"
+if [ "$OS" == "Linux" ]; then
+  export COLUMNS # for subprocesses
+  source "$HOME/.lscolors"
+  if [ -x /usr/bin/dircolors ] && [ -r ~/.dircolors ]; then
+    eval "$(dircolors -b ~/.dircolors)"
+  elif [ -x /usr/bin/dircolors ]; then
+    eval "$(dircolors -b)"
+  fi
+  function ls {
+    command ls -F -h --color=always -v --author --time-style=long-iso -C "$@"
+  }
+  alias ll='ls -lah'
+  alias l='ls'
+  colorflag="--color"
+elif [ "$OS" == "Darwin" ]; then
+  colorflag="-G"
+  export LSCOLORS='ExFxBxDxCxegedabagacad'
+  alias ls="command ls ${colorflag}"
 fi
+
+# List all files colorized in long format
+alias l="ls -lF ${colorflag}"
+alias ll="ls -lah ${colorflag}"
+# List all files colorized in long format, excluding . and ..
+alias la="ls -lAF ${colorflag}"
 
 # Environment configuration
 # ----------------------------------------------------------------------
@@ -259,6 +239,15 @@ if command -v brew >/dev/null; then
   export HOMEBREW_NO_ANALYTICS=1
 fi
 
+# Disable Hashicorp telemetry
+if command -v vagrant >/dev/null; then
+  export VAGRANT_CHECKPOINT_DISABLE=1
+fi
+
+if command -v terraform >/dev/null; then
+  export CHECKPOINT_DISABLE=1
+fi
+
 # Set the KUBECONFIG environment variable
 if [ -r ~/.kube/config ] || command -v kubectl >/dev/null; then
   export KUBE_CONFIG_PATH=~/.kube/config
@@ -268,10 +257,6 @@ fi
 if [ -s "$HOME/.rvm/scripts/rvm" ]; then
   . "$HOME/.rvm/scripts/rvm"
 fi
-
-# Disable Hashicorp telemetry
-export VAGRANT_CHECKPOINT_DISABLE=1
-export CHECKPOINT_DISABLE=1
 
 # Editor and pager
 # ----------------------------------------------------------------------
@@ -289,14 +274,6 @@ export MANPAGER="$PAGER"
 
 # Aliases
 # ----------------------------------------------------------------------
-
-# Pretty ls aliases
-if [ "$OS" == "Linux" ]; then
-  alias ls='ls --color=auto'
-fi
-
-alias ll='ls -lah'
-alias l='ls'
 
 # Vagrant aliases
 if command -v vagrant >/dev/null; then
@@ -319,17 +296,8 @@ fi
 
 # macOS specific aliases
 if [ "$OS" == "Darwin" ]; then
-
-  # Caffeinate alias
-  if command -v caffeinate >/dev/null; then
-    alias dontsleep='caffeinate -d -t 99999'
-  fi
-
   # Alias to flush DNS cache
   alias flushdns='sudo killall -HUP mDNSResponder'
-
-  # Sublime Text
-  alias subl="/Users/user/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl"
 fi
 
 # Command prompt
@@ -345,33 +313,18 @@ GREEN="\[\033[0;32m\]"
 
 prompt_color_localhost() {
   if [ "$LOGNAME" == root ]; then
-    PS1="${RED}\W\$(parse_git_branch)\$(parse_tf_workspace) ${PROMPT_SIGN} ${BROWN}"
+    PS1="${RED}\W ${PROMPT_SIGN} ${BROWN}"
   else
-    PS1="${GREEN}\W\$(parse_git_branch)\$(parse_tf_workspace) ${PROMPT_SIGN} ${GREY}"
+    #PS1="${GREEN}\W ${PROMPT_SIGN} ${GREY}"
+    eval "$(starship init bash)"
   fi
 }
 
 prompt_color_remotehost() {
   if [ "$LOGNAME" == root ]; then
-    PS1="${RED}\u@\h:\w\$(parse_git_branch) # ${BROWN}"
+    PS1="${RED}\u@\h:\w # ${BROWN}"
   else
-    PS1="${GREEN}\u@\h:\w\$(parse_git_branch) $ ${GREY}"
-  fi
-}
-
-parse_git_branch() {
-  if [ -d .git ]; then
-    git symbolic-ref HEAD 2>/dev/null | sed 's#\(.*\)\/\([^\/]*\)$# \2#'
-  else
-    return 1
-  fi
-}
-
-parse_tf_workspace() {
-  if [ -d .terraform ]; then
-    terraform workspace show 2>/dev/null | sed 's/^/\ [/g' | sed 's/$/]/g'
-  else
-    return 1
+    PS1="${GREEN}\u@\h:\w $ ${GREY}"
   fi
 }
 
