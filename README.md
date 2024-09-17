@@ -17,7 +17,7 @@ and recommended software.
 
 Only Mac 🍏 and Linux 🐧 are supported platforms.
 
-![](assets/screenshot.png)
+![](.github/images/screenshot.png)
 
 Built-in Makefile will help you manage **Bash**, **Git** and **Vim** settings,
 **.dircolors**, **.editorconfig**, **.inputrc** and so on.
