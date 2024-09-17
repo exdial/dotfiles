@@ -83,22 +83,6 @@ tunemymac: ## Apply recommended MacOS settings
 	chmod +x .macos
 	exec ./.macos
 
-install-sublime-config: ## Install Sublime Text config
-	echo "✔︎ installing Sublime Text config \"Installed Packages\"..."
-	rsync -arulzh -progress "sublime/Installed Packages" \
-		"/Users/$$USER/Library/Application Support/Sublime Text/"
-	echo "✔︎ installing Sublime Text config \"Packages/User\"..."
-	rsync -arulzh -progress "sublime/Packages" \
-		"/Users/$$USER/Library/Application Support/Sublime Text/"
-
-save-sublime-config: ## Backup Sublime Text config
-	echo "✔︎ saving Sublime Text config \"Installed Packages\"..."
-	rsync -arulzh -progress \
-		"/Users/$$USER/Library/Application Support/Sublime Text/Installed Packages" sublime/
-	echo "✔︎ saving Sublime Text config \"Packages/User\"..."
-	rsync -arulzh -progress \
-		"/Users/$$USER/Library/Application Support/Sublime Text/Packages/User" sublime/Packages/
-
 # VM should have ubuntu-22.04.3-live-server-amd64.iso on the CD drive.
 # Use following settings to create a new VM:
 # Virtualization platform: VMware Fusion
@@ -159,7 +143,7 @@ bootstrap: ## Bootstrap a brand new Linux VM
 	"
 	echo "Now reboot the VM to apply the new settings"
 
-.PHONY: clean uninstall secrets tunemymac install-sublime-config save-sublime-config
+.PHONY: clean uninstall secrets tunemymac
 
 help:
 	@clear && head -n7 README.md | tail -n6 && echo
