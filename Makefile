@@ -14,7 +14,7 @@ else
 endif
 
 all: $(TARGET) ## Install dotfiles, packages and extra
-install: dotfiles ## Install dotfiles only (.bashrc, .gitconfig, .ssh/config, etc...)
+install: dotfiles ## Install dotfiles only
 linux: dotfiles gitconfig bye
 darwin: dotfiles homebrew gitconfig bye
 
@@ -74,12 +74,12 @@ gitconfig:
 bye:
 	echo && echo 🍰 The system has been successfully configured! && echo
 
-clean: ## Remove backup files created during installation (.dotfiles_save_)
+clean: ## Remove backup files (.dotfiles_save_)
 	echo "✔︎ removing backup copies of configuration files..."
 	-rm -rf ~/dotfiles_save_*
 	-rm ~/.ssh/config_save_*
 
-secrets: ## Make an archive with ssh keys, aws tokens, etc
+secrets: ## Make an archive with ssh keys, aws tokens, etc...
 	echo "✔︎ archiving secrets..."
 	-mkdir -p secrets
 	-gpg --export-secret-keys --armor > secrets/gpg-private.key
