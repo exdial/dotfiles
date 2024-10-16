@@ -1,10 +1,8 @@
-
 # Created by https://gitignore.io/api/osx,linux,vim,homebrew
 # Edit at https://gitignore.io/?templates=osx,linux,vim,homebrew
 
 ### Homebrew ###
 Brewfile.lock.json
-Brewfile-extra.lock.json
 
 ### Linux ###
 *~

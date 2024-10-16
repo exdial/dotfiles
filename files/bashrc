@@ -18,7 +18,7 @@ esac
 
 # Check bash version
 if ((BASH_VERSINFO[0] < 4)) && [ "$TERM_PROGRAM" != "vscode" ]; then
-  echo "Looks like you're running an older version of bash"
+  echo "You're running an older version of Bash"
   echo "You need at least bash-4.0"
 fi
 
@@ -184,15 +184,15 @@ fi
 if [ "$OS" == "Linux" ]; then
   export COLUMNS # for subprocesses
   source "$HOME/.lscolors"
-  if [ -x /usr/bin/dircolors ] && [ -r ~/.dircolors ]; then
+  if [ command -v dircolors >/dev/null ] && [ -r ~/.dircolors ]; then
     eval "$(dircolors -b ~/.dircolors)"
-  elif [ -x /usr/bin/dircolors ]; then
+  elif [ command -v dircolors >/dev/null ]; then
     eval "$(dircolors -b)"
   fi
   function ls {
     command ls -F -h --color=always -v --author --time-style=long-iso -C "$@"
   }
-  alias ll='ls -lah'
+  alias ll='ls -la'
   alias l='ls'
   colorflag="--color"
 elif [ "$OS" == "Darwin" ]; then
@@ -236,7 +236,9 @@ fi
 
 # Disable Homebrew reports
 if command -v brew >/dev/null; then
-  export HOMEBREW_NO_ANALYTICS=1
+  export HOMEBREW_NO_ANALYTICS=1 \
+         HOMEBREW_NO_AUTO_UPDATE=1 \
+         HOMEBREW_NO_ENV_HINTS=1
 fi
 
 # Disable Hashicorp telemetry
@@ -283,21 +285,6 @@ fi
 # Kubectl aliases
 if command -v kubectl >/dev/null; then
   alias k=kubectl
-fi
-
-# Alias to start minimal docker container with Linux
-if command -v docker >/dev/null; then
-  alias linux='docker run -it --rm --name linux -h linux.local -v linux:/linux ubuntu:20.04 bash'
-  alias alpine='docker run -it --rm --name alpine -h alpine.local -v linux:/linux alpine:latest sh'
-elif command -v podman >/dev/null; then
-  alias linux='podman run -it --rm --name linux -h linux.local -v linux:/linux ubuntu:20.04 bash'
-  alias alpine='podman run -it --rm --name alpine -h alpine.local -v linux:/linux alpine:latest sh'
-fi
-
-# macOS specific aliases
-if [ "$OS" == "Darwin" ]; then
-  # Alias to flush DNS cache
-  alias flushdns='sudo killall -HUP mDNSResponder'
 fi
 
 # Command prompt
