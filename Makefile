@@ -38,19 +38,25 @@ dotfiles: logo
 		chmod 0644 ~/.$$i; \
 	done
 
-	# echo "✔︎ copying WezTerm configuration..."
+	echo "✔︎ copying WezTerm configuration..."
 	mkdir -p ~/.config/wezterm
-	test -f ~/.config/wezterm/wezterm.lua && mv ~/.config/wezterm/wezterm.lua ~/dotfiles_save_$(RAND)
-	cp -Rn files/config/wezterm ~/.config/wezterm
+	if [ -f ~/.config/wezterm/wezterm.lua ]; then \
+	  mv ~/.config/wezterm/wezterm.lua ~/dotfiles_save_$(RAND); \
+	fi
+	cp -R files/config/wezterm ~/.config
 
 	# echo "✔︎ copying StarShip configuration..."
 	mkdir -p ~/.config
-	test -f ~/.config/starship.toml && mv ~/.config/starship.toml ~/dotfiles_save_$(RAND)
+	if [ -f ~/.config/starship.toml ]; then \
+	  mv ~/.config/starship.toml ~/dotfiles_save_$(RAND); \
+	fi
 	cp -n files/config/starship.toml ~/.config/starship.toml
 
 	echo "✔︎ copying SSH client configuration..."
 	mkdir -p ~/.ssh
-	test -f ~/.ssh/config && mv ~/.ssh/config ~/.ssh/config_save_$(RAND)
+	if [ -f ~/.ssh/config ]; then \
+	  mv ~/.ssh/config ~/.ssh/config_save_$(RAND); \
+	fi
 	cp -n files/ssh/config ~/.ssh/config
 
 	echo "✔︎ configuring Vim..."
@@ -76,10 +82,10 @@ bye:
 
 clean: ## Remove backup files (.dotfiles_save_)
 	echo "✔︎ removing backup copies of configuration files..."
-	-rm -rf ~/dotfiles_save_*
-	-rm ~/.ssh/config_save_*
+	-rm -rf ~/dotfiles_save_* 2>/dev/null
+	-rm ~/.ssh/config_save_* 2>/dev/null
 
-secrets: ## Make an archive with ssh keys, aws tokens, etc...
+secrets: ## Make an archive with keys, tokens, etc...
 	echo "✔︎ archiving secrets..."
 	-mkdir -p secrets
 	-gpg --export-secret-keys --armor > secrets/gpg-private.key
