@@ -9,6 +9,7 @@
 
 # Shellcheck options
 # shellcheck source=/dev/null
+# shellcheck disable=SC2148
 
 # If not running interactively, don't do anything
 case "$-" in
@@ -184,10 +185,8 @@ fi
 if [ "$OS" == "Linux" ]; then
   export COLUMNS # for subprocesses
   source "$HOME/.lscolors"
-  if [ command -v dircolors >/dev/null ] && [ -r ~/.dircolors ]; then
+  if type -p dircolors &>/dev/null; then
     eval "$(dircolors -b ~/.dircolors)"
-  elif [ command -v dircolors >/dev/null ]; then
-    eval "$(dircolors -b)"
   fi
   function ls {
     command ls -F -h --color=always -v --author --time-style=long-iso -C "$@"
@@ -235,23 +234,23 @@ if [ "$OS" == "Darwin" ]; then
 fi
 
 # Disable Homebrew reports
-if command -v brew >/dev/null; then
+if type -p brew &>/dev/null; then
   export HOMEBREW_NO_ANALYTICS=1 \
          HOMEBREW_NO_AUTO_UPDATE=1 \
          HOMEBREW_NO_ENV_HINTS=1
 fi
 
 # Disable Hashicorp telemetry
-if command -v vagrant >/dev/null; then
+if type -p vagrant &>/dev/null; then
   export VAGRANT_CHECKPOINT_DISABLE=1
 fi
 
-if command -v terraform >/dev/null; then
+if type -p terraform &>/dev/null; then
   export CHECKPOINT_DISABLE=1
 fi
 
 # Set the KUBECONFIG environment variable
-if [ -r ~/.kube/config ] || command -v kubectl >/dev/null; then
+if [ -r ~/.kube/config ] || type -p kubectl &>/dev/null; then
   export KUBE_CONFIG_PATH=~/.kube/config
 fi
 
@@ -264,9 +263,9 @@ fi
 # ----------------------------------------------------------------------
 
 # Set the default editor
-if command -v vim >/dev/null; then
+if type -p vim &>/dev/null; then
   export EDITOR='vim'
-elif command -v vi >/dev/null; then
+elif type -p vi &>/dev/null; then
   export EDITOR='vi'
 fi
 
@@ -278,12 +277,12 @@ export MANPAGER="$PAGER"
 # ----------------------------------------------------------------------
 
 # Vagrant aliases
-if command -v vagrant >/dev/null; then
+if type -p vagrant &>/dev/null; then
   alias v='vagrant'
 fi
 
 # Kubectl aliases
-if command -v kubectl >/dev/null; then
+if type -p kubectl &>/dev/null; then
   alias k=kubectl
 fi
 
@@ -352,7 +351,7 @@ fi
 # Bash completions
 # ----------------------------------------------------------------------
 
-command -v brew >/dev/null && brew_home="$(brew --prefix)"
+type -p brew &>/dev/null && brew_home="$(brew --prefix)"
 
 # Load homebrew Mac bash completions
 if [ -n "$brew_home" ] && [ -r "$brew_home/etc/profile.d/bash_completion.sh" ]; then
