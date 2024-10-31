@@ -1,9 +1,8 @@
 USER := $(shell id -un)
 GROUP := $(shell id -gn)
 UNAME :=$(shell uname)
-RAND := $(shell /bin/sh -c "echo $$RANDOM")
 
-export USER GROUP UNAME RAND
+export USER GROUP UNAME
 
 ifeq ($(UNAME), Linux)
 	TARGET = linux
@@ -29,9 +28,14 @@ logo:
 	echo
 
 dotfiles: logo
-	find files -name .DS_Store -delete
-	for i in $$(find files -type f -d 1 -exec basename {} \; | grep -v .local); do \
-		test -f ~/.$$i && mkdir -p ~/dotfiles_save_$(RAND) && mv ~/.$$i ~/dotfiles_save_$(RAND); \
+	find files -name .DS_Store -delete &>/dev/null
+	mkdir -p ~/dotfiles_save
+	echo "✔︎ saving existing dotfiles in ~/dotfiles_save ... $$i"; \
+	for i in $$(find files -maxdepth 1 -type f -exec basename {} \; | grep -v .local); do \
+		mv -f ~/.$$i ~/dotfiles_save; \
+	done
+
+	for i in $$(find files -maxdepth 1 -type f -exec basename {} \; | grep -v .local); do \
 		echo "✔︎ copying dotfiles... $$i"; \
 		cp -n files/$$i ~/.$$i; \
 		chown $$USER:$$GROUP ~/.$$i; \
@@ -41,21 +45,21 @@ dotfiles: logo
 	echo "✔︎ copying WezTerm configuration..."
 	mkdir -p ~/.config/wezterm
 	if [ -f ~/.config/wezterm/wezterm.lua ]; then \
-	  mv ~/.config/wezterm/wezterm.lua ~/dotfiles_save_$(RAND); \
+	  mv ~/.config/wezterm/wezterm.lua ~/dotfiles_save; \
 	fi
 	cp -R files/config/wezterm ~/.config
 
 	# echo "✔︎ copying StarShip configuration..."
 	mkdir -p ~/.config
 	if [ -f ~/.config/starship.toml ]; then \
-	  mv ~/.config/starship.toml ~/dotfiles_save_$(RAND); \
+	  mv ~/.config/starship.toml ~/dotfiles_save; \
 	fi
 	cp -n files/config/starship.toml ~/.config/starship.toml
 
 	echo "✔︎ copying SSH client configuration..."
 	mkdir -p ~/.ssh
 	if [ -f ~/.ssh/config ]; then \
-	  mv ~/.ssh/config ~/.ssh/config_save_$(RAND); \
+	  mv ~/.ssh/config ~/.ssh/config_save; \
 	fi
 	cp -n files/ssh/config ~/.ssh/config
 
@@ -80,17 +84,17 @@ gitconfig:
 bye:
 	echo && echo 🍰 The system has been successfully configured! && echo
 
-clean: ## Remove backup files (.dotfiles_save_)
+clean: ## Remove backup files (dotfiles_save)
 	echo "✔︎ removing backup copies of configuration files..."
-	-rm -rf ~/dotfiles_save_* 2>/dev/null
-	-rm ~/.ssh/config_save_* 2>/dev/null
+	-rm -rf ~/dotfiles_save 2>/dev/null
+	-rm ~/.ssh/config_save 2>/dev/null
 
 secrets: ## Make an archive with keys, tokens, etc...
 	echo "✔︎ archiving secrets..."
 	-mkdir -p secrets
 	-gpg --export-secret-keys --armor > secrets/gpg-private.key
 	-gpg --export --armor > secrets/gpg-public.key
-	-for i in aws docker grip hal kube spin ssh; do \
+	-for i in aws docker grip hal kube spin ssh bashrc.local; do \
 		cp -Rn ~/.$$i secrets/$$i 2>/dev/null; \
 	done
 	tar cvfz secrets.tar.gz secrets
