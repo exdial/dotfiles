@@ -5,9 +5,7 @@ Host *
   ForwardX11            no
   ForwardAgent          no
   LogLevel              ERROR
-  ControlMaster         auto
-  ControlPersist        120
-  ControlPath           ~/.ssh/tmp/%h_%p_%r
   TCPKeepAlive          yes
   UserKnownHostsFile    /dev/null
   StrictHostKeyChecking false
+  IdentitiesOnly        yes
