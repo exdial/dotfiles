@@ -184,9 +184,9 @@ fi
 
 if [ "$OS" == "Linux" ]; then
   export COLUMNS # for subprocesses
-  source "$HOME/.lscolors"
+  source "$HOME/.lscolors" &>/dev/null
   if type -p dircolors &>/dev/null; then
-    eval "$(dircolors -b ~/.dircolors)"
+    eval "$(dircolors -b ~/.dircolors &>/dev/null)"
   fi
   function ls {
     command ls -F -h --color=always -v --author --time-style=long-iso -C "$@"
