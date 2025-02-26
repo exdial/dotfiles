@@ -1,0 +1,74 @@
+// Zed settings
+//
+// ███████╗███████╗██████╗
+// ╚══███╔╝██╔════╝██╔══██╗
+//   ███╔╝ █████╗  ██║  ██║
+//  ███╔╝  ██╔══╝  ██║  ██║
+// ███████╗███████╗██████╔╝
+// ╚══════╝╚══════╝╚═════╝
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+
+{
+  "auto_update": false,
+  "autosave": "on_focus_change",
+  "base_keymap": "SublimeText",
+  "buffer_font_family": "Fira Code",
+  "buffer_font_size": 13.0,
+
+  "tab_bar": { "show_nav_history_buttons": false },
+  "tabs": { "file_icons": true },
+
+  "wrap_guides": [79],
+
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false
+  },
+
+  "terminal": {
+    "blinking": "on",
+    "font_family": "Fira Code",
+    "font_size": 12.3,
+    "line_height": "comfortable",
+    "shell": {
+      "program": "/Users/superuser/.homebrew/bin/bash"
+    }
+  },
+
+  "theme": {
+    "light": "One Light",
+    "dark": "One Dark"
+  },
+
+  "icon_theme": "Material Icon Theme",
+
+  "project_panel": {
+    "entry_spacing": "standard",
+    "indent_size": 10
+  },
+
+  "assistant": {
+    "enabled": false,
+    "button": false,
+    "version": "1"
+  },
+
+  "outline_panel": { "button": false },
+
+  "ui_font_family": "Open Sans",
+  "ui_font_size": 13.4,
+
+  "features": {
+    "copilot": false,
+    "edit_prediction_provider": "none"
+  },
+
+  "collaboration_panel": { "button": false },
+  "chat_panel": { "button": "never" }
+}
