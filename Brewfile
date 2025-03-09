@@ -1,18 +1,21 @@
 # specify a directory to install
 # as a default cask argument
-cask_args appdir: '~/Applications'
+#cask_args appdir: '~/Applications'
 
 # Homebrew
 tap 'homebrew/bundle'
 
-# Awesome fonts
+# Fonts
 cask "font-fira-code"
+cask 'font-zed-mono-nerd-font'
+cask 'font-zed-mono'
+cask 'font-zed-sans'
 
 # Tfswitch
 tap "warrensbox/tap"
 brew "warrensbox/tap/tfswitch"
 
-# Hashicorp products
+# Hashicorp
 tap 'hashicorp/tap'
 
 # Packages
@@ -29,7 +32,6 @@ brew 'go'
 brew 'grip'
 brew 'helm'
 brew 'htop'
-brew 'hyperkit'
 brew 'istioctl'
 brew 'jq'
 brew 'kubectx'
@@ -61,7 +63,6 @@ cask 'amneziavpn'
 cask 'appcleaner'
 cask 'balenaetcher'
 cask 'cyberduck'
-cask 'google-chrome'
 cask 'google-cloud-sdk'
 cask 'handbrake'
 cask 'imageoptim'
@@ -71,7 +72,6 @@ cask 'obsidian'
 cask 'onyx'
 cask 'raspberry-pi-imager'
 cask 'resilio-sync'
-cask 'skype'
 cask 'slack'
 cask 'telegram'
 cask 'the-unarchiver'
@@ -79,8 +79,9 @@ cask 'tor-browser'
 cask 'transmission'
 cask 'vagrant'
 cask 'virtualbox'
-cask 'vscodium'
+cask 'vmware-fusion'
 cask 'vlc'
 cask 'qflipper'
 cask 'wezterm'
+cask 'zed'
 cask 'zoom'

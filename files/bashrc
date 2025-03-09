@@ -18,7 +18,7 @@ case "$-" in
 esac
 
 # Check bash version
-if ((BASH_VERSINFO[0] < 4)) && [ "$TERM_PROGRAM" != "vscode" ]; then
+if ((BASH_VERSINFO[0] < 4)) && [ "$TERM_PROGRAM" != "zed" ]; then
   echo "You're running an older version of Bash"
   echo "You need at least bash-4.0"
 fi
@@ -301,8 +301,11 @@ prompt_color_localhost() {
   if [ "$LOGNAME" == root ]; then
     PS1="${RED}\W ${PROMPT_SIGN} ${BROWN}"
   else
-    #PS1="${GREEN}\W ${PROMPT_SIGN} ${GREY}"
-    eval "$(starship init bash)"
+    if [ "$TERM_PROGRAM" == "zed" ]; then
+      PS1="${GREEN}\W ${PROMPT_SIGN} ${GREY}"
+    else
+      eval "$(starship init bash)"
+    fi
   fi
 }
 
