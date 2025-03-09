@@ -29,18 +29,19 @@ logo:
 
 dotfiles: logo
 	find files -name .DS_Store -delete &>/dev/null
-	mkdir -p ~/dotfiles_save
-	echo "✔︎ saving existing dotfiles in ~/dotfiles_save ... $$i"; \
-	for i in $$(find files -maxdepth 1 -type f -exec basename {} \; | grep -v .local); do \
-		mv -f ~/.$$i ~/dotfiles_save; \
-	done
-
 	for i in $$(find files -maxdepth 1 -type f -exec basename {} \; | grep -v .local); do \
 		echo "✔︎ copying dotfiles... $$i"; \
 		cp -n files/$$i ~/.$$i; \
 		chown $$USER:$$GROUP ~/.$$i; \
 		chmod 0644 ~/.$$i; \
 	done
+
+	echo "✔︎ copying Zed configuration..."
+	mkdir -p ~/.config/zed
+	if [ -f ~/.config/zed/settings.json ]; then \
+	  mv ~/.config/zed/settings.json ~/dotfiles_save; \
+	fi
+	cp -R files/config/zed ~/.config
 
 	echo "✔︎ copying WezTerm configuration..."
 	mkdir -p ~/.config/wezterm
@@ -49,7 +50,7 @@ dotfiles: logo
 	fi
 	cp -R files/config/wezterm ~/.config
 
-	# echo "✔︎ copying StarShip configuration..."
+	echo "✔︎ copying StarShip configuration..."
 	mkdir -p ~/.config
 	if [ -f ~/.config/starship.toml ]; then \
 	  mv ~/.config/starship.toml ~/dotfiles_save; \
@@ -73,7 +74,7 @@ homebrew:
 	curl -LSs https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C ~/.homebrew
 
 	echo "✔︎ installing Homebrew packages..."
-	/Users/$$USER/.homebrew/bin/brew bundle
+	#/Users/$$USER/.homebrew/bin/brew bundle
 
 gitconfig:
 	read -p "💡 Let's configure git client. Name: " NAME; \
@@ -124,8 +125,8 @@ secrets: ## Make an archive with keys, tokens, etc...
 # - Disabled "Share Bluetooth devices with Linux"
 
 # VMADDR format: user@ipaddress
-VMADDR ?= unset
-VMPASS ?= unset
+VMADDR ?= superuser@192.168.71.129
+VMPASS ?= password
 bootstrap: ## Bootstrap a brand new Linux VM
 	# upload the sudoers config into target system
 	scp vm/etc/sudoers.d/nopasswd $(VMADDR):/tmp

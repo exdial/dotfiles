@@ -25,6 +25,7 @@
   "tabs": { "file_icons": true },
 
   "wrap_guides": [79],
+  "soft_wrap": "preferred_line_length",
 
   "telemetry": {
     "diagnostics": false,
