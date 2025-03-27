@@ -1,7 +1,3 @@
-# specify a directory to install
-# as a default cask argument
-#cask_args appdir: '~/Applications'
-
 # Homebrew
 tap 'homebrew/bundle'
 
@@ -41,6 +37,7 @@ brew 'minikube'
 brew 'mtr'
 brew 'neofetch'
 brew 'nmap'
+brew 'osx-cpu-temp'
 brew 'pipx'
 brew 'pre-commit'
 brew 'screen'
@@ -73,6 +70,7 @@ cask 'onyx'
 cask 'raspberry-pi-imager'
 cask 'resilio-sync'
 cask 'slack'
+cask 'talosctl'
 cask 'telegram'
 cask 'the-unarchiver'
 cask 'tor-browser'
