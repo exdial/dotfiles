@@ -1,0 +1,57 @@
+[
+  { "type": "brightnessDown", "align": "left", "width": 34, "bordered": true },
+  { "type": "brightness", "align": "left", "width": 120 },
+  { "type": "brightnessUp", "bordered": true, "align": "left", "width": 34 },
+  { "type": "illuminationDown", "bordered": true, "align": "left", "width": 60 },
+  { "type": "illuminationUp", "width": 60, "bordered": true, "align": "left" },
+  {
+    "type": "weather",
+    "align": "right",
+    "bordered": false,
+    "refreshInterval": 300,
+    "icon_type": "images",
+    "api_key": "ca93a0bb8cdb428552660d83249e4bc9",
+    "tempUnit": "C"
+  },
+  { "type": "volumeDown", "align": "right", "width": 34, "bordered": true },
+  { "type": "volume", "width": 120, "align": "right" },
+  { "type": "volumeUp", "align": "right", "width": 34, "bordered": true },
+  { "type": "mute", "align": "right", "width": 60, "bordered": true },
+  {
+    "type": "shellScriptTitledButton",
+    "align": "right",
+    "bordered": false,
+    "source": {
+      "inline": "currentLang=$(defaults read ~/Library/Preferences/com.apple.HIToolbox.plist AppleSelectedInputSources | grep 'KeyboardLayout Name' | awk -F '= ' '{print $2}' | tr -d ';'); if [[ \"$currentLang\" == \"RussianWin\" ]]; then echo \"RU\"; else echo \"EN\"; fi"
+    },
+    "refreshInterval": 2
+  },
+  {
+    "type": "shellScriptTitledButton",
+    "align": "right",
+    "bordered": false,
+    "source": {
+      "inline": "~/.homebrew/bin/osx-cpu-temp"
+    },
+    "refreshInterval": 0.5
+  },
+  {
+    "type": "battery",
+    "align": "right",
+    "bordered": false,
+    "refreshInterval": 60
+  },
+  {
+    "type": "timeButton",
+    "align": "right",
+    "bordered": true,
+    "haptic": true,
+    "formatTemplate": "HH:mm:ss",
+    "action": "shellScript",
+    "executablePath": "/usr/bin/open",
+    "shellArguments": ["-a", "Calendar"],
+    "longAction": "shellScript",
+    "longExecutablePath": "/usr/bin/pmset",
+    "longShellArguments": ["sleepnow"]
+  }
+]
