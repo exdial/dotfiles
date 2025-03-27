@@ -1,37 +1,74 @@
-// Zed settings
-//
-// ███████╗███████╗██████╗
-// ╚══███╔╝██╔════╝██╔══██╗
-//   ███╔╝ █████╗  ██║  ██║
-//  ███╔╝  ██╔══╝  ██║  ██║
-// ███████╗███████╗██████╔╝
-// ╚══════╝╚══════╝╚═════╝
-//
-// For information on how to configure Zed, see the Zed
-// documentation: https://zed.dev/docs/configuring-zed
-//
-// To see all of Zed's default settings without changing your
-// custom settings, run `zed: open default settings` from the
-// command palette (cmd-shift-p / ctrl-shift-p)
-
 {
-  "auto_update": false,
-  "autosave": "on_focus_change",
+  // Zed settings
+  //
+  // ███████╗███████╗██████╗
+  // ╚══███╔╝██╔════╝██╔══██╗
+  //   ███╔╝ █████╗  ██║  ██║
+  //  ███╔╝  ██╔══╝  ██║  ██║
+  // ███████╗███████╗██████╔╝
+  // ╚══════╝╚══════╝╚═════╝
+  //
+  // For information on how to configure Zed, see the Zed
+  // documentation: https://zed.dev/docs/configuring-zed
+  //
+  // To see all of Zed's default settings without changing your
+  // custom settings, run `zed: open default settings` from the
+  // command palette (cmd-shift-p / ctrl-shift-p)
+  //
+  "theme": {
+    "mode": "system",
+    "light": "Ayu Mirage",
+    "dark": "One Dark"
+  },
+  "icon_theme": "Charmed Icons",
   "base_keymap": "SublimeText",
+  "features": {
+    "copilot": false,
+    "edit_prediction_provider": "none"
+  },
   "buffer_font_family": "Fira Code",
   "buffer_font_size": 13.0,
-
+  "ui_font_family": "Open Sans",
+  "ui_font_size": 13.4,
+  "gutter": {
+    "code_actions": false,
+    "runnables": false,
+    "folds": false
+  },
+  "project_panel": {
+    "entry_spacing": "standard",
+    "indent_size": 24,
+    "button": false
+  },
+  "wrap_guides": [80, 120],
+  "toolbar": {
+    "breadcrumbs": false,
+    "quick_actions": false
+  },
+  "outline_panel": { "button": false },
+  "collaboration_panel": { "button": false },
+  "diagnostics": { "include_warnings": false },
+  "chat_panel": { "button": "never" },
+  "notification_panel": { "button": false },
+  "assistant": {
+    "version": "1",
+    "enabled": false,
+    "button": false
+  },
+  "autosave": "on_focus_change",
   "tab_bar": { "show_nav_history_buttons": false },
-  "tabs": { "file_icons": true },
-
-  "wrap_guides": [79],
-  "soft_wrap": "preferred_line_length",
-
+  "tabs": {
+    "git_status": true,
+    "file_icons": true
+  },
+  // "soft_wrap": "preferred_line_length",
+  "preferred_line_length": 120,
+  "tab_size": 2,
   "telemetry": {
     "diagnostics": false,
     "metrics": false
   },
-
+  "auto_update": false,
   "terminal": {
     "blinking": "on",
     "font_family": "Fira Code",
@@ -40,36 +77,5 @@
     "shell": {
       "program": "/Users/superuser/.homebrew/bin/bash"
     }
-  },
-
-  "theme": {
-    "light": "One Light",
-    "dark": "One Dark"
-  },
-
-  "icon_theme": "Material Icon Theme",
-
-  "project_panel": {
-    "entry_spacing": "standard",
-    "indent_size": 10
-  },
-
-  "assistant": {
-    "enabled": false,
-    "button": false,
-    "version": "1"
-  },
-
-  "outline_panel": { "button": false },
-
-  "ui_font_family": "Open Sans",
-  "ui_font_size": 13.4,
-
-  "features": {
-    "copilot": false,
-    "edit_prediction_provider": "none"
-  },
-
-  "collaboration_panel": { "button": false },
-  "chat_panel": { "button": "never" }
+  }
 }
