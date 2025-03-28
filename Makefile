@@ -1,25 +1,27 @@
+.SILENT:
+.DEFAULT_GOAL := help
+
 USER := $(shell id -un)
 GROUP := $(shell id -gn)
-UNAME :=$(shell uname)
+OS := $(shell uname)
 
-export USER GROUP UNAME
-
-ifeq ($(UNAME), Linux)
-	TARGET = linux
-else ifeq ($(UNAME), Darwin)
-	TARGET = darwin
+ifeq ($(OS), Linux)
+	PLATFORM = linux
+else ifeq ($(OS), Darwin)
+	PLATFORM = darwin
 else
-	TARGET = unsupported-platform
+	PLATFORM = unsupported
 endif
 
-all: $(TARGET) ## Install dotfiles, packages and extra
+all: $(PLATFORM) ## Install dotfiles, packages and extra
 install: dotfiles ## Install dotfiles only
-linux: dotfiles gitconfig bye
-darwin: dotfiles homebrew gitconfig bye
 
-unsupported-platform:
-	echo ❌ Unsupported platform!
-	echo Only Mac 🍏 and Linux 🐧 are supported platforms
+linux: dotfiles gitconfig bye
+
+darwin: dotfiles homebrew gitcongig bye
+
+unsupported:
+	printf "❌ Unsupported platform :(\nOnly Mac 🍏 and Linux 🐧 are supported\n"
 
 logo:
 	clear
@@ -27,51 +29,58 @@ logo:
 	head -n7 README.md | tail -n6
 	echo
 
+bye:
+	printf "\n🍰 The system has been successfully configured.\n\n"
+
+help: logo
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
+	| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[31m%-20s\033[0m %s\n", $$1, $$2}'
+
 dotfiles: logo
 	find files -name .DS_Store -delete &>/dev/null
-	for i in $$(find files -maxdepth 1 -type f -exec basename {} \; | grep -v .local); do \
+	for i in $$(find files -maxdepth 1 -type f -exec basename {} \;); do \
 		echo "✔︎ copying dotfiles... $$i"; \
 		cp -n files/$$i ~/.$$i; \
 		chown $$USER:$$GROUP ~/.$$i; \
 		chmod 0644 ~/.$$i; \
 	done
 
-	echo "✔︎ copying Zed configuration..."
-	mkdir -p ~/.config/zed
-	if [ -f ~/.config/zed/settings.json ]; then \
-	  mv ~/.config/zed/settings.json ~/dotfiles_save; \
+	echo "✔︎ configuring Vim..."
+	mkdir -p ~/.vim/autoload ~/.vim/bundle
+	if [ ! -f ~/.vim/autoload/pathogen.vim ]; then \
+		curl -LSkso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim; \
 	fi
-	cp -R files/config/zed ~/.config
-
-	echo "✔︎ copying WezTerm configuration..."
-	mkdir -p ~/.config/wezterm
-	if [ -f ~/.config/wezterm/wezterm.lua ]; then \
-	  mv ~/.config/wezterm/wezterm.lua ~/dotfiles_save; \
-	fi
-	cp -R files/config/wezterm ~/.config
-
-	echo "✔︎ copying StarShip configuration..."
-	mkdir -p ~/.config
-	if [ -f ~/.config/starship.toml ]; then \
-	  mv ~/.config/starship.toml ~/dotfiles_save; \
-	fi
-	cp -n files/config/starship.toml ~/.config/starship.toml
 
 	echo "✔︎ copying SSH client configuration..."
 	mkdir -p ~/.ssh
-	if [ -f ~/.ssh/config ]; then \
-	  mv ~/.ssh/config ~/.ssh/config_save; \
-	fi
-	cp -n files/ssh/config ~/.ssh/config
+	-cp -n files/ssh/config ~/.ssh/config
 
-	echo "✔︎ configuring Vim..."
-	mkdir -p ~/.vim/autoload ~/.vim/bundle
-	curl -LSkso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+	echo "✔︎ copying WezTerm configuration..."
+	mkdir -p ~/.config/wezterm
+	if [ ! -d ~/.config/wezterm ]; then \
+		cp -R files/config/wezterm ~/.config; \
+	fi
+
+	echo "✔︎ copying StarShip configuration..."
+	mkdir -p ~/.config
+	-cp -n files/config/starship.toml ~/.config/starship.toml
+
+	echo "✔︎ copying Zed configuration..."
+	mkdir -p ~/.config/zed
+	if [ ! -d ~/.config/zed ]; then \
+		cp -R files/config/zed ~/.config; \
+	fi
+
+	echo "✔︎ copying MTMR (My TouchBar My rules) configuration..."
+	mkdir -p ~/"Library/Application Support/MTMR"
+	-cp -n "files/Library/Application Support/MTMR/items.json" ~/"Library/Application Support/MTMR/items.json"
 
 homebrew:
 	echo "✔︎ installing Homebrew..."
-	test -d ~/.homebrew && echo "~/.homebrew exists" && exit 1 || mkdir ~/.homebrew
-	curl -LSs https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C ~/.homebrew
+	if [ ! -d ~/.homebrew ]; then \
+		mkdir ~/.homebrew \
+		curl -LSs https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C ~/.homebrew \
+	fi
 
 	echo "✔︎ installing Homebrew packages..."
 	#/Users/$$USER/.homebrew/bin/brew bundle
@@ -81,14 +90,6 @@ gitconfig:
 	 git config --global user.name $$NAME
 	read -p "💡 Email: " EMAIL; \
 	 git config --global user.email $$EMAIL
-
-bye:
-	echo && echo 🍰 The system has been successfully configured! && echo
-
-clean: ## Remove backup files (dotfiles_save)
-	echo "✔︎ removing backup copies of configuration files..."
-	-rm -rf ~/dotfiles_save 2>/dev/null
-	-rm ~/.ssh/config_save 2>/dev/null
 
 secrets: ## Make an archive with keys, tokens, etc...
 	echo "✔︎ archiving secrets..."
@@ -100,71 +101,65 @@ secrets: ## Make an archive with keys, tokens, etc...
 	done
 	tar cvfz secrets.tar.gz secrets
 	-rm -rf secrets
-	echo && echo "🔐 secrets.tar.gz has been created" && echo
+	printf "\n🔐 secrets.tar.gz has been created\n\n"
 
-# VM should have ubuntu-22.04.3-live-server-amd64.iso on the CD drive.
-# Use following settings to create a new VM:
-# Virtualization platform: VMware Fusion
-# Firmware type: Legacy BIOS
-# Machine name: Ubuntu.vmwarevm
-# CPU: 4, RAM 8192 MB
-# Display:
-# - Enabled Accelerated 3D Graphics
-# - Shared graphics memory: 8192 MB
-# - Enabled full resolution for Retina display
-# HDD:
-# - Disk size of 50 GB
-# - Bus type: SCSI
-# - Disabled "Split into multiple files"
-# Removed devices:
-# - Sound card
-# - Printer
-# - Camera
-# USB & Bluetooth
-# - USB Compatibility: USB 3.1
-# - Disabled "Share Bluetooth devices with Linux"
 
-# VMADDR format: user@ipaddress
-VMADDR ?= superuser@192.168.71.129
-VMPASS ?= password
-bootstrap: ## Bootstrap a brand new Linux VM
-	# upload the sudoers config into target system
-	scp vm/etc/sudoers.d/nopasswd $(VMADDR):/tmp
-	# using sudo move the sudoers config to the proper location
-	ssh $(VMADDR) " \
-		echo $(VMPASS) | sudo -S cp /tmp/nopasswd /etc/sudoers.d/ \
-	"
-	# install missing packages
-	ssh $(VMADDR) " \
-		sudo apt-get update && \
-		sudo apt-get -y install dialog && \
-		sudo apt-get -y upgrade && \
-		sudo apt-get install locales && \
-		sudo locale-gen --purge en_US.UTF-8 && \
-		echo LANG=en_US.UTF-8 | sudo tee -a /etc/default/locale && \
-		sudo apt-get -y install open-vm-tools open-vm-tools-desktop \
-			xserver-xorg x11-xserver-utils lightdm lightdm-gtk-greeter \
-			vim i3 kitty git make bash-completion htop \
-			fonts-firacode fonts-emojione --no-install-recommends \
-	"
+# The VM should have Debian ISO on the CD drive.
+# Set the password of the root user to "root".
+# Make sure `PermitRootLogin` is enabled in /etc/sshd/sshd_config.
+# Restart sshd after changing the configuration.
+#
+# Use following settings to create a VM:
+# 	Virtualization platform: VMware Fusion
+#		Firmware type: UEFI
+#   CPU: 4, RAM 8192 MB
+#   Display:
+#   - Enabled Accelerated 3D Graphics
+#   - Shared graphics memory: 8192 MB
+#   - Enabled full resolution for Retina display
+#   HDD:
+#   - Disk size of 50 GB
+#   - Bus type: SCSI
+#   - Disabled "Split into multiple files"
+#   Remove followind devices:
+#   - Sound card
+#   - Printer
+#   - Camera
+#   - USB
+
+VMADDR ?= 192.168.71.135
+VMUSER ?= exdial
+
+# SSH options that are used
+SSH_OPTS=-o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+
+# TODO: Define GRUB
+# "ipv6.disable=1 mitigations=off nowatchdog systemd.show_status=true"
+#
+vminit: ## Bootstrap a brand new Linux VM
+	ssh-copy-id -f root@$(VMADDR)
+	scp extras/vm/etc/sudoers.d/nopasswd root@$(VMADDR):/tmp
+	ssh root@$(VMADDR) "apt-get update && apt-get -y install dialog && apt-get -y upgrade && \
+		apt-get -y install sudo vim make i3 kitty git htop bash-completion \
+		  xserver-xorg xserver-xorg-video-vmware x11-xserver-utils x11-utils \
+			mesa-utils lightdm lightdm-gtk-greeter \
+			open-vm-tools open-vm-tools-desktop fonts-firacode --no-install-recommends && \
+		mkdir -m 0700 -p /home/$(VMUSER)/.ssh && \
+		mv  /root/.ssh/authorized_keys /home/$(VMUSER)/.ssh/ && \
+		chown -R $(VMUSER):$(VMUSER) /home/$(VMUSER) && \
+		usermod -aG sudo $(VMUSER) && \
+		mv /tmp/nopasswd /etc/sudoers.d/"
 	# configure display manager
-	ssh $(VMADDR) "echo GDK_SCALE=2 | sudo tee -a /etc/environment"
-	scp vm/etc/lightdm/lightdm.conf.d/50-display-setup.conf $(VMADDR):/tmp
-	scp vm/usr/share/lightdm_display_setup.sh $(VMADDR):/tmp
-	scp vm/usr/share/lightdm/lightdm-gtk-greeter.conf.d/01_ubuntu.conf $(VMADDR):/tmp
-	scp vm/home/$$USER/.Xresources $(VMADDR):/home/$$USER/.Xresources
-	ssh $(VMADDR) " \
+	ssh $(VMUSER)@$(VMADDR) "echo GDK_SCALE=2 | sudo tee -a /etc/environment"
+	scp extras/vm/etc/lightdm/lightdm.conf.d/50-display-setup.conf $(VMUSER)@$(VMADDR):/tmp
+	scp extras/vm/usr/share/lightdm_display_setup.sh $(VMUSER)@$(VMADDR):/tmp
+	scp extras/vm/usr/share/lightdm/lightdm-gtk-greeter.conf.d/99_custom.conf $(VMUSER)@$(VMADDR):/tmp
+	scp extras/vm/home/user/.Xresources $(VMUSER)@$(VMADDR):/home/$(VMUSER)/.Xresources
+	ssh $(VMUSER)@$(VMADDR) "\
+		sudo mkdir -p /etc/lightdm/lightdm.conf.d && \
 		sudo mv /tmp/50-display-setup.conf /etc/lightdm/lightdm.conf.d/ && \
 		sudo mv /tmp/lightdm_display_setup.sh /usr/share/ && \
 		sudo chown lightdm:lightdm /usr/share/lightdm_display_setup.sh && \
 		sudo chmod +x /usr/share/lightdm_display_setup.sh && \
-		sudo mv /tmp/01_ubuntu.conf /usr/share/lightdm/lightdm-gtk-greeter.conf.d/ \
-	"
-	echo "Now reboot the VM to apply the new settings"
-
-help: logo
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
-	| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
-
-.DEFAULT_GOAL := help
-.SILENT:
+		sudo mv /tmp/99_custom.conf /usr/share/lightdm/lightdm-gtk-greeter.conf.d/ && \
+		sudo reboot"
