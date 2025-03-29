@@ -40,7 +40,7 @@ dotfiles: logo
 	find files -name .DS_Store -delete &>/dev/null
 	for i in $$(find files -maxdepth 1 -type f -exec basename {} \;); do \
 		echo "✔︎ copying dotfiles... $$i"; \
-		cp -n files/$$i ~/.$$i; \
+		cp -f files/$$i ~/.$$i; \
 		chown $$USER:$$GROUP ~/.$$i; \
 		chmod 0644 ~/.$$i; \
 	done
@@ -51,29 +51,21 @@ dotfiles: logo
 		curl -LSkso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim; \
 	fi
 
-	echo "✔︎ copying SSH client configuration..."
-	mkdir -p ~/.ssh
-	-cp -n files/ssh/config ~/.ssh/config
-
 	echo "✔︎ copying WezTerm configuration..."
 	mkdir -p ~/.config/wezterm
-	if [ ! -d ~/.config/wezterm ]; then \
-		cp -R files/config/wezterm ~/.config; \
-	fi
+	cp -R files/config/wezterm ~/.config
 
 	echo "✔︎ copying StarShip configuration..."
 	mkdir -p ~/.config
-	-cp -n files/config/starship.toml ~/.config/starship.toml
+	cp -f files/config/starship.toml ~/.config/starship.toml
 
 	echo "✔︎ copying Zed configuration..."
 	mkdir -p ~/.config/zed
-	if [ ! -d ~/.config/zed ]; then \
-		cp -R files/config/zed ~/.config; \
-	fi
+	cp -R files/config/zed ~/.config
 
 	echo "✔︎ copying MTMR (My TouchBar My rules) configuration..."
 	mkdir -p ~/"Library/Application Support/MTMR"
-	-cp -n "files/Library/Application Support/MTMR/items.json" ~/"Library/Application Support/MTMR/items.json"
+	cp -f "files/Library/Application Support/MTMR/items.json" ~/"Library/Application Support/MTMR/items.json"
 
 homebrew:
 	echo "✔︎ installing Homebrew..."
@@ -83,7 +75,7 @@ homebrew:
 	fi
 
 	echo "✔︎ installing Homebrew packages..."
-	#/Users/$$USER/.homebrew/bin/brew bundle
+	/Users/$$USER/.homebrew/bin/brew bundle
 
 gitconfig:
 	read -p "💡 Let's configure git client. Name: " NAME; \
@@ -127,8 +119,8 @@ secrets: ## Make an archive with keys, tokens, etc...
 #   - Camera
 #   - USB
 
-VMADDR ?= 192.168.71.135
-VMUSER ?= exdial
+VMADDR ?=
+VMUSER ?=
 
 # SSH options that are used
 SSH_OPTS=-o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
@@ -148,7 +140,11 @@ vminit: ## Bootstrap a brand new Linux VM
 		mv  /root/.ssh/authorized_keys /home/$(VMUSER)/.ssh/ && \
 		chown -R $(VMUSER):$(VMUSER) /home/$(VMUSER) && \
 		usermod -aG sudo $(VMUSER) && \
-		mv /tmp/nopasswd /etc/sudoers.d/"
+		mv /tmp/nopasswd /etc/sudoers.d/ && \
+		sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT.*/GRUB_CMDLINE_LINUX_DEFAULT=\"ipv6.disable=1 mitigations=off nowatchdog systemd.show_status=true\"/g' \
+			/etc/default/grub && \
+		sed -i 's/GRUB_TIMEOUT.*/GRUB_TIMEOUT=0/g' /etc/default/grub && \
+		update-grub"
 	# configure display manager
 	ssh $(VMUSER)@$(VMADDR) "echo GDK_SCALE=2 | sudo tee -a /etc/environment"
 	scp extras/vm/etc/lightdm/lightdm.conf.d/50-display-setup.conf $(VMUSER)@$(VMADDR):/tmp
