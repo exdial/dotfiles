@@ -155,16 +155,6 @@ else
   : "${PATH="/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/bin"}"
 fi
 
-# Add homebrew's bin directory to PATH
-if [ -d "$HOME/.homebrew/bin" ]; then
-  PATH="$HOME/.homebrew/bin:$PATH"
-fi
-
-# Add homebrew's sbin directory to PATH
-if [ -d "$HOME/.homebrew/sbin" ]; then
-  PATH="$HOME/.homebrew/sbin:$PATH"
-fi
-
 # Add other bin directories to PATH
 if [ -d ~/bin ]; then
   PATH="$HOME/bin:$PATH"
@@ -174,9 +164,13 @@ if [ -d "$HOME/.local/bin" ]; then
   PATH="$HOME/.local/bin:$PATH"
 fi
 
-# Add homebrew's python bin directory to PATH
-if [ -d "$HOME/.homebrew/opt/python@3.9/bin" ]; then
-  PATH="$HOME/.homebrew/opt/python@3.9/bin:$PATH"
+# Add Homebrew yo PATH
+if type -p brew &>/dev/null; then
+  eval "$(/usr/local/bin/brew shellenv)"
+  # disable Homebrew telemetry
+  export HOMEBREW_NO_ANALYTICS=1
+  export HOMEBREW_NO_AUTO_UPDATE=1
+  export HOMEBREW_NO_ENV_HINTS=1
 fi
 
 # Colors
@@ -210,10 +204,8 @@ alias la="ls -lAF ${colorflag}"
 # ----------------------------------------------------------------------
 
 # Shell
-if [ -f ~/.homebrew/bin/bash ]; then
-  export SHELL=~/.homebrew/bin/bash
-else
-  export SHELL=/bin/bash
+if [ -f "/usr/local/bin/bash" ]; then
+  export SHELL="/usr/local/bin/bash"
 fi
 
 # Locale
@@ -231,13 +223,6 @@ export FTP_PASSIVE
 # https://support.apple.com/en-us/HT208050
 if [ "$OS" == "Darwin" ]; then
   export BASH_SILENCE_DEPRECATION_WARNING=1
-fi
-
-# Disable Homebrew reports
-if type -p brew &>/dev/null; then
-  export HOMEBREW_NO_ANALYTICS=1 \
-         HOMEBREW_NO_AUTO_UPDATE=1 \
-         HOMEBREW_NO_ENV_HINTS=1
 fi
 
 # Disable Hashicorp telemetry
@@ -355,6 +340,7 @@ fi
 # ----------------------------------------------------------------------
 
 type -p brew &>/dev/null && brew_home="$(brew --prefix)"
+complete -cf sudo
 
 # Load homebrew Mac bash completions
 if [ -n "$brew_home" ] && [ -r "$brew_home/etc/profile.d/bash_completion.sh" ]; then
@@ -373,9 +359,8 @@ if [ -n "$brew_home" ] && [ -d "$brew_home/Caskroom/google-cloud-sdk" ]; then
 fi
 
 # Load Linux bash completions
-if [ "$OS" == "Linux" ] && [ -d "/etc/bash_completion" ]; then
+if [ "$OS" == "Linux" ] && [ -f "/etc/bash_completion" ]; then
   . /etc/bash_completion
-  complete -cf sudo
 fi
 
 # Include other environments

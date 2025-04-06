@@ -19,7 +19,7 @@ local config = wezterm.config_builder()
 config = {
   -- Spawn a homebrew bash as a default shell
   default_prog = {
-    "/Users/" .. os.getenv("USER") .. "/.homebrew/bin/bash",
+    "/usr/local/bin/bash",
   },
 
   -- Basic configuration

@@ -28,7 +28,7 @@
   },
   "buffer_font_family": "Fira Code",
   "buffer_font_size": 13.0,
-  "ui_font_family": "Open Sans",
+  "ui_font_family": "Inter",
   "ui_font_size": 13.4,
   "gutter": {
     "code_actions": false,
@@ -75,7 +75,7 @@
     "font_size": 12.3,
     "line_height": "comfortable",
     "shell": {
-      "program": "/Users/superuser/.homebrew/bin/bash"
+      "program": "/usr/local/bin/bash"
     }
   }
 }

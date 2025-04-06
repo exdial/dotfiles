@@ -18,16 +18,14 @@ install: dotfiles ## Install dotfiles only
 
 linux: dotfiles gitconfig bye
 
-darwin: dotfiles homebrew gitcongig bye
+darwin: dotfiles homebrew gitconfig bye
 
 unsupported:
-	printf "❌ Unsupported platform :(\nOnly Mac 🍏 and Linux 🐧 are supported\n"
+	printf "❌ Unsupported platform :(\nOnly Intel Mac 🍏 and Linux 🐧 are supported\n"
+	exit 1
 
 logo:
-	clear
-	echo
-	head -n7 README.md | tail -n6
-	echo
+	clear && echo && sed -n '2,7p' README.md && echo
 
 bye:
 	printf "\n🍰 The system has been successfully configured.\n\n"
@@ -69,19 +67,18 @@ dotfiles: logo
 
 homebrew:
 	echo "✔︎ installing Homebrew..."
-	if [ ! -d ~/.homebrew ]; then \
-		mkdir ~/.homebrew \
-		curl -LSs https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C ~/.homebrew \
+	if [ ! -d "/usr/local/Homebrew" ]; then \
+		NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 	fi
 
 	echo "✔︎ installing Homebrew packages..."
-	/Users/$$USER/.homebrew/bin/brew bundle
+	/usr/local/bin/brew bundle
 
 gitconfig:
-	read -p "💡 Let's configure git client. Name: " NAME; \
-	 git config --global user.name $$NAME
-	read -p "💡 Email: " EMAIL; \
-	 git config --global user.email $$EMAIL
+	@read -p "💡 Git name: " NAME && \
+	read -p "📧 Email: " EMAIL && \
+	git config --global user.name "$$NAME" && \
+	git config --global user.email "$$EMAIL"
 
 secrets: ## Make an archive with keys, tokens, etc...
 	echo "✔︎ archiving secrets..."
@@ -95,7 +92,6 @@ secrets: ## Make an archive with keys, tokens, etc...
 	-rm -rf secrets
 	printf "\n🔐 secrets.tar.gz has been created\n\n"
 
-
 # The VM should have Debian ISO on the CD drive.
 # Set the password of the root user to "root".
 # Make sure `PermitRootLogin` is enabled in /etc/sshd/sshd_config.
@@ -103,7 +99,7 @@ secrets: ## Make an archive with keys, tokens, etc...
 #
 # Use following settings to create a VM:
 # 	Virtualization platform: VMware Fusion
-#		Firmware type: UEFI
+#	Firmware type: UEFI
 #   CPU: 4, RAM 8192 MB
 #   Display:
 #   - Enabled Accelerated 3D Graphics
@@ -125,33 +121,35 @@ VMUSER ?=
 # SSH options that are used
 SSH_OPTS=-o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
 
-# TODO: Define GRUB
-# "ipv6.disable=1 mitigations=off nowatchdog systemd.show_status=true"
-#
 vminit: ## Bootstrap a brand new Linux VM
+	@test -n "$(VMADDR)" || (echo "❌ VMADDR is not set"; exit 1)
+	@test -n "$(VMUSER)" || (echo "❌ VMUSER is not set"; exit 1)
+
 	ssh-copy-id -f root@$(VMADDR)
 	scp extras/vm/etc/sudoers.d/nopasswd root@$(VMADDR):/tmp
-	ssh root@$(VMADDR) "apt-get update && apt-get -y install dialog && apt-get -y upgrade && \
-		apt-get -y install sudo vim make i3 kitty git htop bash-completion \
+	ssh $(SSH_OPTS) root@$(VMADDR) "apt-get update && apt-get -y install dialog && apt-get -y upgrade && \
+		apt-get -y install sudo vim make curl i3 kitty git htop bash-completion \
 		  xserver-xorg xserver-xorg-video-vmware x11-xserver-utils x11-utils \
 			mesa-utils lightdm lightdm-gtk-greeter \
-			open-vm-tools open-vm-tools-desktop fonts-firacode --no-install-recommends && \
+			open-vm-tools open-vm-tools-desktop fonts-firacode \
+			ansible ansible-lint asciinema awscli gh go kubectx nmap pipx \
+			pre-commit screen shellcheck shfmt skopeo && \
 		mkdir -m 0700 -p /home/$(VMUSER)/.ssh && \
 		mv  /root/.ssh/authorized_keys /home/$(VMUSER)/.ssh/ && \
 		chown -R $(VMUSER):$(VMUSER) /home/$(VMUSER) && \
 		usermod -aG sudo $(VMUSER) && \
 		mv /tmp/nopasswd /etc/sudoers.d/ && \
-		sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT.*/GRUB_CMDLINE_LINUX_DEFAULT=\"ipv6.disable=1 mitigations=off nowatchdog systemd.show_status=true\"/g' \
+		sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT.*/GRUB_CMDLINE_LINUX_DEFAULT="ipv6.disable=1 mitigations=off nowatchdog systemd.show_status=true"/' \
 			/etc/default/grub && \
 		sed -i 's/GRUB_TIMEOUT.*/GRUB_TIMEOUT=0/g' /etc/default/grub && \
 		update-grub"
 	# configure display manager
-	ssh $(VMUSER)@$(VMADDR) "echo GDK_SCALE=2 | sudo tee -a /etc/environment"
+	ssh $(SSH_OPTS) $(VMUSER)@$(VMADDR) "echo GDK_SCALE=2 | sudo tee -a /etc/environment"
 	scp extras/vm/etc/lightdm/lightdm.conf.d/50-display-setup.conf $(VMUSER)@$(VMADDR):/tmp
 	scp extras/vm/usr/share/lightdm_display_setup.sh $(VMUSER)@$(VMADDR):/tmp
 	scp extras/vm/usr/share/lightdm/lightdm-gtk-greeter.conf.d/99_custom.conf $(VMUSER)@$(VMADDR):/tmp
 	scp extras/vm/home/user/.Xresources $(VMUSER)@$(VMADDR):/home/$(VMUSER)/.Xresources
-	ssh $(VMUSER)@$(VMADDR) "\
+	ssh $(SSH_OPTS) $(VMUSER)@$(VMADDR) "\
 		sudo mkdir -p /etc/lightdm/lightdm.conf.d && \
 		sudo mv /tmp/50-display-setup.conf /etc/lightdm/lightdm.conf.d/ && \
 		sudo mv /tmp/lightdm_display_setup.sh /usr/share/ && \
