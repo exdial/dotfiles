@@ -1,0 +1,13 @@
+[window]
+padding.x = 4
+padding.y = 4
+
+decorations = "Full"
+
+[font]
+normal.family = "Fira Code Retina"
+bold.family = "Fira Code Retina"
+italic.family = "Fira Code Retina"
+bold_italic.family = "Fira Code Retina"
+
+size = 11.0

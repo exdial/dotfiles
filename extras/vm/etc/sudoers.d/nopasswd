@@ -1,1 +1,5 @@
 %sudo ALL=(ALL:ALL) NOPASSWD:ALL
+
+Defaults env_keep += "BASH_COMPLETION_COMPAT_DIR"
+Defaults env_keep += "XDG_DATA_DIRS"
+Defaults env_keep += "SYSTEMD_PAGER"

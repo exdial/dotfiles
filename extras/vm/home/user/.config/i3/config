@@ -1,0 +1,86 @@
+set $mod Mod4
+
+font pango:Fira Code Retina 11
+
+# Window visuals
+new_window pixel 0
+new_float pixel 0
+
+exec --no-startup-id killall i3bar
+exec --no-startup-id alacritty
+
+# start a terminal
+bindsym $mod+Return exec alacritty
+
+# kill focused window
+bindsym $mod+w kill
+
+# enter fullscreen mode for the focused container
+bindsym $mod+Shift+f fullscreen toggle
+
+# Define names for default workspaces for which we configure key bindings later on.
+# We use variables to avoid repeating the names in multiple places.
+set $ws1 "1"
+set $ws2 "2"
+
+# switch to workspace
+bindsym $mod+1 workspace number $ws1
+bindsym $mod+2 workspace number $ws2
+
+# move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace number $ws1
+bindsym $mod+Shift+2 move container to workspace number $ws2
+
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r restart
+
+set $mode_resize Resize / Move
+
+# This mode will make it easier to resize and move workspaces without
+# having to bind a bunch of obscure bindings.
+mode "$mode_resize" {
+        # These bindings trigger as soon as you enter the resize mode
+
+        # Focus parent and child
+        bindsym a focus parent
+        bindsym $mod+a focus parent
+        bindsym c focus child
+        bindsym $mod+c focus child
+
+        # Move containers
+        bindsym 1 move container to workspace number $ws1; workspace number $ws1
+        bindsym 2 move container to workspace number $ws2; workspace number $ws2
+        bindsym 3 move container to workspace number $ws3; workspace number $ws3
+        bindsym 4 move container to workspace number $ws4; workspace number $ws4
+
+        # Pressing left will shrink the window’s width.
+        # Pressing right will grow the window’s width.
+        # Pressing up will shrink the window’s height.
+        # Pressing down will grow the window’s height.
+        bindsym h resize shrink width 10 px or 10 ppt
+        bindsym j resize grow height 10 px or 10 ppt
+        bindsym k resize shrink height 10 px or 10 ppt
+        bindsym l resize grow width 10 px or 10 ppt
+
+        # back to normal: Enter or Escape or $mod+r
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+        bindsym $mod+r mode "default"
+}
+
+bindsym $mod+r mode "$mode_resize"
+
+# System Mode -----------------------------------------------------------------
+set $mode_system System (e) logout, (r) reboot, (Ctrl+s) shutdown
+
+mode "$mode_system" {
+    bindsym e exec --no-startup-id i3-msg exit, mode "default"
+    bindsym r exec --no-startup-id systemctl reboot, mode "default"
+    bindsym Ctrl+s exec --no-startup-id systemctl poweroff -i, mode "default"
+
+    # back to normal: Enter or Escape
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+
+bindsym $mod+BackSpace mode "$mode_system"
