@@ -92,7 +92,7 @@ secrets: ## Make an archive with keys, tokens, etc...
 	-rm -rf secrets
 	printf "\n🔐 secrets.tar.gz has been created\n\n"
 
-# The VM should have Debian ISO on the CD drive.
+# The VM should have Ubuntu Noble ISO on the CD drive.
 # Set the password of the root user to "root".
 # Make sure `PermitRootLogin` is enabled in /etc/sshd/sshd_config.
 # Restart sshd after changing the configuration.
@@ -119,41 +119,36 @@ VMADDR ?=
 VMUSER ?=
 
 # SSH options that are used
-SSH_OPTS=-o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+SSH_OPTS=-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519
 
 vminit: ## Bootstrap a brand new Linux VM
 	@test -n "$(VMADDR)" || (echo "❌ VMADDR is not set"; exit 1)
 	@test -n "$(VMUSER)" || (echo "❌ VMUSER is not set"; exit 1)
 
 	ssh-copy-id -f root@$(VMADDR)
-	scp extras/vm/etc/sudoers.d/nopasswd root@$(VMADDR):/tmp
-	ssh $(SSH_OPTS) root@$(VMADDR) "apt-get update && apt-get -y install dialog && apt-get -y upgrade && \
-		apt-get -y install sudo vim make curl i3 kitty git htop bash-completion \
-		  xserver-xorg xserver-xorg-video-vmware x11-xserver-utils x11-utils \
-			mesa-utils lightdm lightdm-gtk-greeter \
-			open-vm-tools open-vm-tools-desktop fonts-firacode \
-			ansible ansible-lint asciinema awscli gh go kubectx nmap pipx \
-			pre-commit screen shellcheck shfmt skopeo && \
+	scp $(SSH_OPTS) extras/vm/etc/sudoers.d/nopasswd root@$(VMADDR):/etc/sudoers.d/nopasswd
+	ssh $(SSH_OPTS) root@$(VMADDR) "mkdir -p /etc/systemd/system/getty@tty1.service.d"
+	scp $(SSH_OPTS) extras/vm/etc/systemd/system/getty/override.conf root@$(VMADDR):/etc/systemd/system/getty@tty1.service.d/override.conf
+	ssh $(SSH_OPTS) root@$(VMADDR) "systemctl stop snapd ModemManager \
+		packagekit multipath-tools udisks2 unattended-upgrades &>/dev/null && \
+		apt-get -y purge snapd cloud-init modemmanager packagekit multipath-tools udisks2 \
+			unattended-upgrades apport ubuntu-pro* update-notifier-common xdg-user-dirs \
+			lxd-agent-loader lxd-installer byobu fonts-dejavu-* fonts-ubuntu* && \
+		rm -rf ~/snap /snap /var/snap /var/lib/snapd /etc/cloud/ /var/lib/cloud/ && \
+		apt-get -y autoremove --purge && apt-get -y clean && \
+		apt-get update && apt-get -y upgrade && \
+		apt-get -y install sudo make curl vim git htop bash-completion \
+			xserver-xorg-core xserver-xorg x11-xserver-utils xserver-xorg-video-vmware \
+			xinit i3-wm alacritty fonts-firacode open-vm-tools open-vm-tools-desktop && \
 		mkdir -m 0700 -p /home/$(VMUSER)/.ssh && \
 		mv  /root/.ssh/authorized_keys /home/$(VMUSER)/.ssh/ && \
 		chown -R $(VMUSER):$(VMUSER) /home/$(VMUSER) && \
 		usermod -aG sudo $(VMUSER) && \
-		mv /tmp/nopasswd /etc/sudoers.d/ && \
-		sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT.*/GRUB_CMDLINE_LINUX_DEFAULT="ipv6.disable=1 mitigations=off nowatchdog systemd.show_status=true"/' \
-			/etc/default/grub && \
-		sed -i 's/GRUB_TIMEOUT.*/GRUB_TIMEOUT=0/g' /etc/default/grub && \
+		sed -i 's/GRUB_CMDLINE_LINUX=.*/GRUB_CMDLINE_LINUX=\"quiet loglevel=1 nowatchdog ipv6.disable=1 mitigations=off plymouth.enable=0 vt.global_cursor_default=0 nohz=on\"/g' /etc/default/grub && \
+		sed -i 's/GRUB_TIMEOUT.*/GRUB_TIMEOUT=1/g' /etc/default/grub && \
 		update-grub"
-	# configure display manager
-	ssh $(SSH_OPTS) $(VMUSER)@$(VMADDR) "echo GDK_SCALE=2 | sudo tee -a /etc/environment"
-	scp extras/vm/etc/lightdm/lightdm.conf.d/50-display-setup.conf $(VMUSER)@$(VMADDR):/tmp
-	scp extras/vm/usr/share/lightdm_display_setup.sh $(VMUSER)@$(VMADDR):/tmp
-	scp extras/vm/usr/share/lightdm/lightdm-gtk-greeter.conf.d/99_custom.conf $(VMUSER)@$(VMADDR):/tmp
-	scp extras/vm/home/user/.Xresources $(VMUSER)@$(VMADDR):/home/$(VMUSER)/.Xresources
-	ssh $(SSH_OPTS) $(VMUSER)@$(VMADDR) "\
-		sudo mkdir -p /etc/lightdm/lightdm.conf.d && \
-		sudo mv /tmp/50-display-setup.conf /etc/lightdm/lightdm.conf.d/ && \
-		sudo mv /tmp/lightdm_display_setup.sh /usr/share/ && \
-		sudo chown lightdm:lightdm /usr/share/lightdm_display_setup.sh && \
-		sudo chmod +x /usr/share/lightdm_display_setup.sh && \
-		sudo mv /tmp/99_custom.conf /usr/share/lightdm/lightdm-gtk-greeter.conf.d/ && \
-		sudo reboot"
+	scp $(SSH_OPTS) extras/vm/home/user/.xinitrc $(VMUSER)@$(VMADDR):/home/$(VMUSER)/.xinitrc
+	scp $(SSH_OPTS) extras/vm/home/user/.Xresources $(VMUSER)@$(VMADDR):/home/$(VMUSER)/.Xresources
+	scp $(SSH_OPTS) extras/vm/home/user/.bash_profile $(VMUSER)@$(VMADDR):/home/$(VMUSER)/.bash_profile
+	scp $(SSH_OPTS) -r extras/vm/home/user/.config $(VMUSER)@$(VMADDR):/home/$(VMUSER)/.config
+	ssh $(SSH_OPTS) $(VMUSER)@$(VMADDR) "sudo reboot"

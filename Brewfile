@@ -5,6 +5,9 @@ cask 'font-zed-mono'
 cask 'font-zed-sans'
 
 # Packages
+brew 'awscli'
+brew 'ansible'
+brew 'asciinema'
 brew 'bash'
 brew 'grip'
 brew 'htop'
@@ -12,6 +15,14 @@ brew 'osx-cpu-temp'
 brew 'pre-commit'
 brew 'starship'
 brew 'yt-dlp'
+brew 'kubectx'
+brew 'nmap'
+brew 'pipx'
+brew 'shellcheck'
+brew 'shfmt'
+brew 'skopeo'
+brew 'gh'
+
 
 # Casks
 cask 'amneziavpn'
