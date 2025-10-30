@@ -269,6 +269,8 @@ fi
 # Kubectl aliases
 if type -p kubectl &>/dev/null; then
   alias k=kubectl
+  # Autocomplete for kubectl via alias k
+  complete -o default -F __start_kubectl k
 fi
 
 # Command prompt
@@ -342,14 +344,21 @@ fi
 type -p brew &>/dev/null && brew_home="$(brew --prefix)"
 complete -cf sudo
 
+# SSH autocomplete
+_ssh_host_autocomplete() {
+    local cword hosts
+    cword=${COMP_WORDS[COMP_CWORD]}
+    hosts=$(grep -i '^host ' ~/.ssh/config | cut -c 6- | grep -Fv '*')
+    COMPREPLY=($(compgen -W "$hosts" -- "$cword"))
+}
+complete -o default -o bashdefault -o filenames -F _ssh_host_autocomplete ssh
+
 # Load homebrew Mac bash completions
 if [ -n "$brew_home" ] && [ -r "$brew_home/etc/profile.d/bash_completion.sh" ]; then
   . "$brew_home/etc/profile.d/bash_completion.sh"
 fi
-if [ -n "$brew_home" ] && [ -d "$brew_home/etc/bash_completion.d" ]; then
-  for i in "$brew_home"/etc/bash_completion.d/*; do
-    . "$i"
-  done
+if [ -f "$brew_home/etc/bash_completion" ]; then
+  . "$brew_home/etc/bash_completion"
 fi
 
 # Load Google SDK bash completions
@@ -366,7 +375,12 @@ fi
 # Include other environments
 # ----------------------------------------------------------------------
 
-# Load host specific settings without changing the main config
-if [ -f ~/.bashrc.local ]; then
-  . ~/.bashrc.local
-fi
+# Load all host-specific settings without changing the main config
+for rcfile in ~/.bashrc.*; do
+  # Skip if no matches
+  [ -e "$rcfile" ] || continue
+  # Skip the main .bashrc itself if matched accidentally
+  [ "$rcfile" = ~/.bashrc ] && continue
+  # Source the file
+  . "$rcfile"
+done

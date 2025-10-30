@@ -17,23 +17,31 @@
   //
   "theme": {
     "mode": "system",
-    "light": "Ayu Mirage",
+    "light": "One Light",
     "dark": "One Dark"
   },
-  "icon_theme": "Charmed Icons",
+  "icon_theme": "Soft Charmed Icons",
   "base_keymap": "SublimeText",
   "features": {
-    "copilot": false,
     "edit_prediction_provider": "none"
   },
+  "global_lsp_settings": {
+    "button": false
+  },
+  "git_panel": { "button": false },
+  "search": { "button": false },
+  "diagnostics": { "button": false, "include_warnings": false },
+  "debugger": { "button": false },
   "buffer_font_family": "Fira Code",
-  "buffer_font_size": 13.0,
-  "ui_font_family": "Inter",
-  "ui_font_size": 13.4,
+  "buffer_font_size": 12.4,
+  // "ui_font_family": "Inter",
+  "ui_font_size": 13.5,
   "gutter": {
-    "code_actions": false,
+    "line_numbers": true,
     "runnables": false,
-    "folds": false
+    "breakpoints": false,
+    "folds": false,
+    "min_line_number_digits": 2
   },
   "project_panel": {
     "entry_spacing": "standard",
@@ -47,11 +55,9 @@
   },
   "outline_panel": { "button": false },
   "collaboration_panel": { "button": false },
-  "diagnostics": { "include_warnings": false },
   "chat_panel": { "button": "never" },
   "notification_panel": { "button": false },
-  "assistant": {
-    "version": "1",
+  "agent": {
     "enabled": false,
     "button": false
   },
@@ -71,8 +77,7 @@
   "auto_update": false,
   "terminal": {
     "blinking": "on",
-    "font_family": "Fira Code",
-    "font_size": 12.3,
+    "font_size": 11.8,
     "line_height": "comfortable",
     "shell": {
       "program": "/usr/local/bin/bash"
